@@ -6,8 +6,9 @@ import time
 
 app = Flask(__name__)
 
-TASKS_FILE = "tasks.json"
-REPTILES_FILE = "reptiles.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TASKS_FILE = os.path.join(BASE_DIR, "tasks.json")
+REPTILES_FILE = os.path.join(BASE_DIR, "reptiles.json")
 
 
 #  JSON helpers
@@ -230,8 +231,6 @@ def reptiles_form_post():
     return redirect(url_for("reptile_view", reptile_id=reptile["id"]))
 
 
-from flask import render_template  
-
 @app.get("/reptiles-ui")
 def reptiles_ui():
     return render_template("reptiles.html")
@@ -244,6 +243,48 @@ def reptile_view(reptile_id):
         return "Reptile not found", 404
     return render_template("reptile_view.html", reptile=reptile)
 
+#adding 2 routes to app.py
+
+@app.get("/reptiles/<int:reptile_id>/edit")
+def edit_reptile_form(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+    return render_template("reptile_edit.html", reptile=reptile)
+
+
+@app.post("/reptiles/<int:reptile_id>/edit")
+def edit_reptile_post(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+
+    # Pull fields from reptile form
+    reptile["name"] = request.form.get("name", reptile.get("name", "")).strip()
+    reptile["species"] = request.form.get("species", reptile.get("species", "")).strip()
+    reptile["appearance"] = request.form.get("appearance", reptile.get("appearance", "")).strip()
+    reptile["diet"] = request.form.get("diet", reptile.get("diet", "")).strip()
+    reptile["image_url"] = request.form.get("image_url", reptile.get("image_url", "")).strip()
+    reptile["last_fed"] = request.form.get("last_fed", reptile.get("last_fed", "")).strip()
+
+    weight_raw = request.form.get("weight_grams", "").strip()
+    try:
+        reptile["weight_grams"] = float(weight_raw) if weight_raw else None
+    except ValueError:
+        # keep old weight if invalid input
+        pass
+
+    # Feeding schedule (ensure dict exists)
+    reptile.setdefault("feeding_schedule", {})
+    reptile["feeding_schedule"]["frequency"] = request.form.get("feed_frequency", "").strip()
+    reptile["feeding_schedule"]["time_of_day"] = request.form.get("feed_time", "").strip()
+    reptile["feeding_schedule"]["notes"] = request.form.get("feed_notes", "").strip()
+
+    save_json(REPTILES_FILE, reptiles)
+
+    return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
 
 #last line only
