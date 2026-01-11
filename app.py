@@ -1,78 +1,3 @@
-# from flask import Flask, request, jsonify
-# import json
-# import os
-
-# app = Flask(__name__)
-# DATA_FILE = 'tasks.json'
-
-# # Load tasks from the file
-# def load_tasks():
-#     if not os.path.exists(DATA_FILE):
-#         return []
-#     try:
-#         with open(DATA_FILE, 'r') as file:
-#             return json.load(file)
-#     except json.JSONDecodeError:
-#         return []
-
-# # Save tasks to the file
-# def save_tasks(tasks):
-#     with open(DATA_FILE, 'w') as file:
-#         json.dump(tasks, file, indent=2)
-        
-# @app.route('/')
-# def home():
-#     return 'Welcome to the To-Do API!'
-
-# @app.route('/tasks', methods=['GET'])
-# def get_tasks():
-#     return jsonify(load_tasks())
-
-# @app.route('/tasks/<int:task_id>', methods=['GET'])
-# def get_task(task_id):
-#     tasks = load_tasks()
-#     task = next((t for t in tasks if t['id'] == task_id), None)
-#     return jsonify(task or {'error': 'Task not found'}), 200 if task else 404
-
-# @app.route('/tasks', methods=['POST'])
-# def create_task():
-#     tasks = load_tasks()
-#     data = request.get_json(silent=True) or {}
-#     new_task = {
-#         'id': int(time.time() * 1000),
-#         'title': data.get('title', 'Untitled Task'),
-#         'completed': False
-#     }
-#     tasks.append(new_task)
-#     save_tasks(tasks)
-#     return jsonify(new_task), 201
-
-# @app.route('/tasks/<int:task_id>', methods=['PUT'])
-# def update_task(task_id):
-#     tasks = load_tasks()
-#     task = next((t for t in tasks if t['id'] == task_id), None)
-#     if not task:
-#         return jsonify({'error': 'Task not found'}), 404
-#     data = request.get_json(silent=True) or {}
-#     task['title'] = data.get('title', task['title'])
-#     task['completed'] = data.get('completed', task['completed'])
-#     save_tasks(tasks)
-#     return jsonify(task)
-
-# @app.route('/tasks/<int:task_id>', methods=['DELETE'])
-# def delete_task(task_id):
-#     tasks = load_tasks()
-#     new_tasks = [t for t in tasks if t['id'] != task_id]
-    
-#     if len(new_tasks) == len(tasks):
-#         return jsonify({'error': 'Task not found'}), 404
-    
-#     save_tasks(tasks)
-#     return '', 204
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
 from flask import Flask, request, jsonify
 import json
 import os
@@ -84,7 +9,7 @@ TASKS_FILE = "tasks.json"
 REPTILES_FILE = "reptiles.json"
 
 
-# ---------- Generic JSON helpers ----------
+#  JSON helpers
 def load_json(path):
     if not os.path.exists(path):
         return []
@@ -104,13 +29,13 @@ def new_id():
     return int(time.time() * 1000)
 
 
-# ---------- Home ----------
+# Home (placeholder -- Scheduling app title would go here)
 @app.get("/")
 def home():
     return "Welcome! Try /tasks or /reptiles"
 
 
-# ---------- Tasks (your existing API, slightly safer) ----------
+# tasks
 @app.get("/tasks")
 def get_tasks():
     return jsonify(load_json(TASKS_FILE))
@@ -166,7 +91,7 @@ def delete_task(task_id):
     return "", 204
 
 
-# ---------- Reptiles ----------
+# reptiles, could expand to all pets/insects 
 def validate_reptile_payload(data, partial=False):
     """
     partial=False: required for create
@@ -213,7 +138,7 @@ def create_reptile():
             "time_of_day": "",
             "notes": ""
         }),
-        "last_fed": data.get("last_fed", "")  # e.g. "2026-01-10"
+        "last_fed": data.get("last_fed", "")  #"2026-01-10"
     }
 
     reptiles.append(reptile)
