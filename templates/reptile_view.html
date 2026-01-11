@@ -7,9 +7,6 @@
   </head>
 
   <body>
-    <div style="background: yellow; padding: 10px; font-weight: bold;">
-    REPTILE VIEW TEMPLATE LOADED ✅ (WITH FEEDING FORM)
-    </div>
     <div class="container">
       <div class="card">
         <a href="/reptiles-form" class="subtle">← Back to list</a>
@@ -71,6 +68,8 @@
               <th>Food</th>
               <th>Amount</th>
               <th>Notes</th>
+              <th>Actions</th>
+
             </tr>
           </thead>
           <tbody>
@@ -86,6 +85,15 @@
                   <td>{{ e.food }}</td>
                   <td>{{ e.amount }}</td>
                   <td>{{ e.notes }}</td>
+                  <td>
+                    <form method="post"
+                            action="{{ url_for('delete_feeding', reptile_id=reptile.id, feeding_id=e.id) }}"
+                            onsubmit="return confirm('Delete this feeding entry?');"
+                            style="margin:0;">
+                        <button type="submit" class="btnDanger">Delete</button>
+                    </form>
+                  </td>
+
                 </tr>
               {% endfor %}
             {% endif %}
