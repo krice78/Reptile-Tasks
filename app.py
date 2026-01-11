@@ -286,6 +286,52 @@ def edit_reptile_post(reptile_id):
 
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
+#food log POST route to save feeding entry
+@app.post("/reptiles/<int:reptile_id>/feedings")
+def add_feeding(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+
+    date = request.form.get("date", "").strip()
+    food = request.form.get("food", "").strip()
+    amount = request.form.get("amount", "").strip()
+    notes = request.form.get("notes", "").strip()
+
+    # Basic validation (date + food required)
+    if not date or not food:
+        return redirect(url_for("reptile_view", reptile_id=reptile_id))
+
+    reptile.setdefault("feeding_log", [])
+    reptile["feeding_log"].append({
+        "id": new_id(),
+        "date": date,
+        "food": food,
+        "amount": amount,
+        "notes": notes
+    })
+
+    # keep last_fed in sync automatically
+    reptile["last_fed"] = date
+
+    save_json(REPTILES_FILE, reptiles)
+    return redirect(url_for("reptile_view", reptile_id=reptile_id))
+
+#debug reptile view
+@app.get("/debug/reptile-view/<int:reptile_id>")
+def debug_reptile_view(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+
+    html = render_template("reptile_view.html", reptile=reptile)
+    # show first 2000 chars so we can confirm the feeding form exists in the HTML
+    return "<pre>" + html.replace("<", "&lt;").replace(">", "&gt;")[:2000] + "</pre>"
+
+
+
 
 #last line only
 if __name__ == "__main__":

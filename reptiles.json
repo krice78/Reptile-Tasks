@@ -88,5 +88,35 @@
       "notes": "2 fuzzies"
     },
     "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768165896256,
+    "name": "otto",
+    "species": "crested",
+    "image_url": "https://www.avianexotichospital.com/uploads/1/0/4/8/104851457/crestedgecko_orig.jpg",
+    "appearance": "yellow, light brown, grayish, no tail frog butt :)",
+    "diet": "rapashi, insects",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "Rapashi twice per week, insects 1-2 times per week",
+      "time_of_day": "evening",
+      "notes": "crickets and dubia roaches, she does not like worms, like mango and cherry rapashi"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768166272700,
+    "name": "Guppy",
+    "species": "African Fat Tail Gecko",
+    "image_url": "https://www.reptilecymru.co.uk/wp-content/uploads/2021/04/African-Fat-Tailed-Gecko.png",
+    "appearance": "brown",
+    "diet": "insects",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "twice weekly",
+      "time_of_day": "evening",
+      "notes": "likes crickets the most"
+    },
+    "last_fed": "2026-08-01"
   }
 ]
