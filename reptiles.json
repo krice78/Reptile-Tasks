@@ -117,6 +117,22 @@
       "time_of_day": "evening",
       "notes": "likes crickets the most"
     },
-    "last_fed": "2026-08-01"
+    "last_fed": "2026-01-09",
+    "feeding_log": [
+      {
+        "id": 1768171690884,
+        "date": "2026-01-08",
+        "food": "Crickets",
+        "amount": "6",
+        "notes": "ate all"
+      },
+      {
+        "id": 1768171706205,
+        "date": "2026-01-09",
+        "food": "Crickets",
+        "amount": "2",
+        "notes": "ate all"
+      }
+    ]
   }
 ]
