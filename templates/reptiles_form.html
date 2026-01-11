@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reptile Tracker</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; background: #f6f7fb; }
+      .card { background: white; padding: 16px; border-radius: 12px; max-width: 720px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+      label { display:block; margin-top:10px; font-weight:600; }
+      input { width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; }
+      button { margin-top: 12px; padding:10px 14px; border:0; border-radius:10px; background:#222; color:white; font-weight:600; cursor:pointer; }
+      table { margin-top: 18px; width: 100%; border-collapse: collapse; }
+      th, td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align:left; }
+      .subtle { color:#555; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Reptile Tracker</h1>
+      <p class="subtle">Add reptiles and keep basic care notes.</p>
+
+      <form method="post" action="/reptiles-form">
+        <label>Name *</label>
+        <input name="name" required />
+
+        <label>Species *</label>
+        <input name="species" required />
+
+        <label>Appearance</label>
+        <input name="appearance" />
+
+        <label>Diet</label>
+        <input name="diet" />
+
+        <label>Weight (grams)</label>
+        <input name="weight_grams" type="number" step="0.1" />
+
+        <label>Feeding Frequency</label>
+        <input name="feed_frequency" placeholder="Every other day" />
+
+        <label>Time of Day</label>
+        <input name="feed_time" placeholder="Evening" />
+
+        <label>Feeding Notes</label>
+        <input name="feed_notes" placeholder="Insects on weekends" />
+
+        <label>Last Fed (YYYY-MM-DD)</label>
+        <input name="last_fed" placeholder="2026-01-11" />
+
+        <button type="submit">Add Reptile</button>
+      </form>
+
+      <h2 style="margin-top:22px;">Saved Reptiles</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Species</th>
+            <th>Weight (g)</th>
+            <th>Last Fed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if reptiles|length == 0 %}
+            <tr><td colspan="4" class="subtle">No reptiles yet.</td></tr>
+          {% else %}
+            {% for r in reptiles %}
+              <tr>
+                <td>{{ r.name }}</td>
+                <td>{{ r.species }}</td>
+                <td>{{ r.weight_grams }}</td>
+                <td>{{ r.last_fed }}</td>
+              </tr>
+            {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

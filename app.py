@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, url_for
+
 import json
 import os
 import time
@@ -181,6 +182,50 @@ def delete_reptile(reptile_id):
 
     save_json(REPTILES_FILE, new_reptiles)
     return "", 204
+
+
+# routes to reptile form
+
+@app.get("/reptiles-form")
+def reptiles_form():
+    reptiles = load_json(REPTILES_FILE)
+    return render_template("reptiles_form.html", reptiles=reptiles)
+
+@app.post("/reptiles-form")
+def reptiles_form_post():
+    reptiles = load_json(REPTILES_FILE)
+
+    name = request.form.get("name", "").strip()
+    species = request.form.get("species", "").strip()
+
+    if not name or not species:
+        return redirect(url_for("reptiles_form"))
+
+    weight_raw = request.form.get("weight_grams", "").strip()
+    try:
+        weight_grams = float(weight_raw) if weight_raw else None
+    except ValueError:
+        weight_grams = None
+
+    reptile = {
+        "id": new_id(),
+        "name": name,
+        "species": species,
+        "appearance": request.form.get("appearance", "").strip(),
+        "diet": request.form.get("diet", "").strip(),
+        "weight_grams": weight_grams,
+        "feeding_schedule": {
+            "frequency": request.form.get("feed_frequency", "").strip(),
+            "time_of_day": request.form.get("feed_time", "").strip(),
+            "notes": request.form.get("feed_notes", "").strip(),
+        },
+        "last_fed": request.form.get("last_fed", "").strip(),
+    }
+
+    reptiles.append(reptile)
+    save_json(REPTILES_FILE, reptiles)
+
+    return redirect(url_for("reptiles_form"))
 
 
 if __name__ == "__main__":

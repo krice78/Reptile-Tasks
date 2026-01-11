@@ -1,14 +1,1 @@
-{
-  "id": 1700000000000,
-  "name": "Otto",
-  "species": "Crested Gecko",
-  "appearance": "Cream with dalmatian spots",
-  "diet": "Pangea + insects",
-  "weight_grams": 42.5,
-  "feeding_schedule": {
-    "frequency": "Every other day",
-    "time_of_day": "Evening",
-    "notes": "Insects on weekends"
-  },
-  "last_fed": "2026-01-10"
-}
+[]
