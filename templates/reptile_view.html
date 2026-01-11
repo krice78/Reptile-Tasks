@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ reptile.name }} - Reptile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <a href="/reptiles-form" class="subtle">← Back to list</a>
+        <h1 style="margin-top:10px;">{{ reptile.name }}</h1>
+        <p class="subtle">{{ reptile.species }}</p>
+
+        {% if reptile.image_url %}
+          <img src="{{ reptile.image_url }}" alt="photo of {{ reptile.name }}" style="max-width:320px;border-radius:14px;margin:12px 0;">
+        {% endif %}
+
+        <div style="display:grid;gap:8px;margin-top:10px;">
+          <div><b>Appearance:</b> {{ reptile.appearance }}</div>
+          <div><b>Diet:</b> {{ reptile.diet }}</div>
+          <div><b>Weight (g):</b> {{ reptile.weight_grams }}</div>
+          <div><b>Last fed:</b> {{ reptile.last_fed }}</div>
+          <div><b>Feeding frequency:</b> {{ reptile.feeding_schedule.frequency }}</div>
+          <div><b>Time of day:</b> {{ reptile.feeding_schedule.time_of_day }}</div>
+          <div><b>Notes:</b> {{ reptile.feeding_schedule.notes }}</div>
+        </div>
+
+        <p class="subtle small" style="margin-top:12px;">ID: {{ reptile.id }}</p>
+      </div>
+    </div>
+  </body>
+</html>

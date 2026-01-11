@@ -26,6 +26,12 @@
         <label>Species *</label>
         <input name="species" required />
 
+        <div class="row">
+        <label>Image URL</label>
+        <input name="image_url" placeholder="https://example.com/otto.jpg" />
+        </div>
+
+
         <label>Appearance</label>
         <input name="appearance" />
 
@@ -67,7 +73,15 @@
           {% else %}
             {% for r in reptiles %}
               <tr>
-                <td>{{ r.name }}</td>
+                <td>
+                <a class="reptileLink" href="{{ url_for('reptile_view', reptile_id=r.id) }}">
+                {% if r.image_url %}
+                <img class="thumb" src="{{ r.image_url }}" alt="photo of {{ r.name }}">
+                {% endif %}
+                {{ r.name }}
+                </a>
+                </td>
+
                 <td>{{ r.species }}</td>
                 <td>{{ r.weight_grams }}</td>
                 <td>{{ r.last_fed }}</td>

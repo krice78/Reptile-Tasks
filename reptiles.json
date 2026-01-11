@@ -1,1 +1,92 @@
-[]
+[
+  {
+    "id": 1768160770497,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768160851663,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768160855608,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768160869524,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768160873168,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  },
+  {
+    "id": 1768161986336,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies"
+    },
+    "last_fed": "2026-07-01"
+  }
+]

@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reptile Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+      .centerBox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        gap: 20px;
+      }
+
+      .bigButton {
+        padding: 16px 28px;
+        font-size: 18px;
+        border-radius: 14px;
+        border: none;
+        background: #222;
+        color: white;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.2s;
+      }
+
+      .bigButton:hover {
+        background: #000;
+        transform: scale(1.03);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card centerBox">
+        <h1>🦎 Reptile Tracker</h1>
+        <p class="subtle">Track feeding, weight, and care notes.</p>
+
+        <a href="/reptiles-form">
+          <button class="bigButton">➕ Add Reptile</button>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

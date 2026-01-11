@@ -211,6 +211,8 @@ def reptiles_form_post():
         "id": new_id(),
         "name": name,
         "species": species,
+        #includes field image for species
+        "image_url": request.form.get("image_url", "").strip(),
         "appearance": request.form.get("appearance", "").strip(),
         "diet": request.form.get("diet", "").strip(),
         "weight_grams": weight_grams,
@@ -225,8 +227,29 @@ def reptiles_form_post():
     reptiles.append(reptile)
     save_json(REPTILES_FILE, reptiles)
 
-    return redirect(url_for("reptiles_form"))
+    return redirect(url_for("reptile_view", reptile_id=reptile["id"]))
 
 
+from flask import render_template  
+
+@app.get("/reptiles-ui")
+def reptiles_ui():
+    return render_template("reptiles.html")
+
+@app.get("/reptiles/<int:reptile_id>/view")
+def reptile_view(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+    return render_template("reptile_view.html", reptile=reptile)
+
+
+
+#last line only
 if __name__ == "__main__":
     app.run(debug=True)
+    
+    
+
+
