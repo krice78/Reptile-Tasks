@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <title>Reptile Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
     <style>
       body { font-family: Arial, sans-serif; padding: 20px; background: #f6f7fb; }
       .card { background: white; padding: 16px; border-radius: 12px; max-width: 720px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
@@ -76,7 +78,7 @@
                 <td>
                 <a class="reptileLink" href="{{ url_for('reptile_view', reptile_id=r.id) }}">
                 {% if r.image_url %}
-                <img class="thumb" src="{{ r.image_url }}" alt="photo of {{ r.name }}">
+                    <img class="thumb" src="{{ r.image_url }}" alt="photo of {{ r.name }}">
                 {% endif %}
                 {{ r.name }}
                 </a>

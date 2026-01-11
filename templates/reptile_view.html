@@ -13,7 +13,8 @@
         <p class="subtle">{{ reptile.species }}</p>
 
         {% if reptile.image_url %}
-          <img src="{{ reptile.image_url }}" alt="photo of {{ reptile.name }}" style="max-width:320px;border-radius:14px;margin:12px 0;">
+          <img src="{{ reptile.image_url }}" 
+            alt="photo of {{ reptile.name }}" style="max-width:320px;border-radius:14px;margin:12px 0;">
         {% endif %}
 
         <div style="display:grid;gap:8px;margin-top:10px;">
