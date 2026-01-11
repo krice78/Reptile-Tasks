@@ -327,10 +327,36 @@ def debug_reptile_view(reptile_id):
         return "Reptile not found", 404
 
     html = render_template("reptile_view.html", reptile=reptile)
-    # show first 2000 chars so we can confirm the feeding form exists in the HTML
+    # show first 2000 chars so i can confirm the feeding form exists in the HTML
     return "<pre>" + html.replace("<", "&lt;").replace(">", "&gt;")[:2000] + "</pre>"
 
+#delete feeding entry
 
+@app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/delete")
+def delete_feeding(reptile_id, feeding_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    if not reptile:
+        return "Reptile not found", 404
+
+    reptile.setdefault("feeding_log", [])
+    before = len(reptile["feeding_log"])
+    reptile["feeding_log"] = [e for e in reptile["feeding_log"] if e.get("id") != feeding_id]
+
+    # If nothing changed, entry wasn't found
+    if len(reptile["feeding_log"]) == before:
+        return redirect(url_for("reptile_view", reptile_id=reptile_id))
+
+    # keep last_fed synced to the newest remaining entry
+    if reptile["feeding_log"]:
+        # find max date string 
+        newest = max((e.get("date", "") for e in reptile["feeding_log"]), default="")
+        reptile["last_fed"] = newest
+    else:
+        reptile["last_fed"] = ""
+
+    save_json(REPTILES_FILE, reptiles)
+    return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
 
 #last line only
