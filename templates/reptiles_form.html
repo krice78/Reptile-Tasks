@@ -67,6 +67,7 @@
             <th>Species</th>
             <th>Weight (g)</th>
             <th>Last Fed</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -87,6 +88,9 @@
                 <td>{{ r.species }}</td>
                 <td>{{ r.weight_grams }}</td>
                 <td>{{ r.last_fed }}</td>
+                <td>
+                <span class="badge badge-{{ r.feed_status_key }}">{{ r.feed_status_label }}</span>
+                </td>
               </tr>
             {% endfor %}
           {% endif %}

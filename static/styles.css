@@ -96,3 +96,36 @@ th, td {
   cursor: pointer;
   font-weight: 700;
 }
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  border: 1px solid #eee;
+}
+
+.badge-ok {
+  background: #e9f7ee;
+  border-color: #bfe6cc;
+  color: #135c2e;
+}
+
+.badge-due {
+  background: #fff6db;
+  border-color: #f0d48a;
+  color: #6b4b00;
+}
+
+.badge-overdue {
+  background: #ffe2e2;
+  border-color: #f2a4a4;
+  color: #7a0b0b;
+}
+
+.badge-unknown {
+  background: #f1f3f6;
+  border-color: #d6dbe3;
+  color: #4a5568;
+}

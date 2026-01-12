@@ -12,7 +12,16 @@
       "time_of_day": "evening",
       "notes": "2 fuzzies"
     },
-    "last_fed": "2026-07-01"
+    "last_fed": "2026-01-02",
+    "feeding_log": [
+      {
+        "id": 1768180230170,
+        "date": "2026-01-02",
+        "food": "Fuzzies",
+        "amount": "2",
+        "notes": "ate all"
+      }
+    ]
   },
   {
     "id": 1768160851663,

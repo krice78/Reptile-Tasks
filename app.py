@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 import json
 import os
 import time
+from datetime import date, datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -184,13 +186,93 @@ def delete_reptile(reptile_id):
     save_json(REPTILES_FILE, new_reptiles)
     return "", 204
 
+#helpers for notifications
+
+def parse_date_yyyy_mm_dd(s: str):
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def frequency_to_interval_days(freq: str):
+    """
+    Convert a human frequency string into an interval in days.
+    You can expand this mapping anytime.
+    """
+    f = (freq or "").strip().lower()
+
+    # common phrases
+    if "daily" in f or "every day" in f:
+        return 1
+    if "twice weekly" in f or "2x weekly" in f or "two times" in f:
+        return 3  # ~every 3-4 days
+    if "every other day" in f:
+        return 2
+    if "weekly" in f:
+        return 7
+    if "biweekly" in f or "every 2 week" in f or "every two week" in f:
+        return 14
+    if "monthly" in f:
+        return 30
+
+    # handle a number like "3 days" / "every 5 days"
+    # very lightweight parsing
+    for token in f.split():
+        if token.isdigit():
+            n = int(token)
+            if "day" in f:
+                return n
+            if "week" in f:
+                return n * 7
+
+    return None  # unknown
+
+
+def compute_feed_status(last_fed_str: str, freq_str: str):
+    """
+    Returns: (status_key, label_text)
+    status_key: 'ok', 'due', 'overdue', 'unknown'
+    """
+    last_fed = parse_date_yyyy_mm_dd(last_fed_str)
+    interval = frequency_to_interval_days(freq_str)
+
+    if not last_fed or not interval:
+        return "unknown", "Unknown"
+
+    due_date = last_fed + timedelta(days=interval)
+    today = date.today()
+    days_until = (due_date - today).days
+
+    if days_until < 0:
+        return "overdue", f"Overdue ({abs(days_until)}d)"
+    if days_until == 0:
+        return "due", "Due today"
+    if days_until <= 1:
+        return "due", "Due soon"
+    return "ok", f"OK ({days_until}d)"
+
 
 # routes to reptile form
 
 @app.get("/reptiles-form")
 def reptiles_form():
     reptiles = load_json(REPTILES_FILE)
+
+    for r in reptiles:
+        freq = ""
+        if isinstance(r.get("feeding_schedule"), dict):
+            freq = r["feeding_schedule"].get("frequency", "")
+
+        status_key, status_label = compute_feed_status(r.get("last_fed", ""), freq)
+        r["feed_status_key"] = status_key
+        r["feed_status_label"] = status_label
+
     return render_template("reptiles_form.html", reptiles=reptiles)
+
 
 @app.post("/reptiles-form")
 def reptiles_form_post():
@@ -242,6 +324,8 @@ def reptile_view(reptile_id):
     if not reptile:
         return "Reptile not found", 404
     return render_template("reptile_view.html", reptile=reptile)
+
+
 
 #adding 2 routes to app.py
 
