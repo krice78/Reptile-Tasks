@@ -86,3 +86,13 @@ th, td {
   object-fit: cover;
   border: 1px solid #860d0d;
 }
+
+
+.btnDanger {
+  margin-top: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 700;
+}
