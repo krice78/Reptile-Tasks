@@ -12,6 +12,47 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TASKS_FILE = os.path.join(BASE_DIR, "tasks.json")
 REPTILES_FILE = os.path.join(BASE_DIR, "reptiles.json")
 
+# Feeding frequency to days mapping
+FREQ_TO_DAYS = {
+    "daily": 1,
+    "every_other_day": 2,
+    "every_3_days": 3,
+    "weekly": 7,
+    "biweekly": 14,
+    "monthly": 30,  
+}
+
+def feed_status(next_date_str):
+    try:
+        d = datetime.strptime(next_date_str, "%Y-%m-%d").date()
+    except:
+        return "good"
+
+    today = date.today()
+    if d < today:
+        return "overdue"
+    elif (d - today).days <= 2:
+        return "soon"
+    else:
+        return "good"
+
+
+def parse_yyyy_mm_dd(s: str):
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+def calc_next_feed_date(last_fed_str: str, frequency: str) -> str:
+    last = parse_yyyy_mm_dd(last_fed_str)
+    days = FREQ_TO_DAYS.get((frequency or "").strip())
+    if not last or not days:
+        return ""
+    return (last + timedelta(days=days)).strftime("%Y-%m-%d")
+
 
 #  JSON helpers
 def load_json(path):
@@ -32,11 +73,6 @@ def save_json(path, data):
 def new_id():
     return int(time.time() * 1000)
 
-
-# Home (placeholder -- Scheduling app title would go here)
-@app.get("/")
-def home():
-    return "Welcome! Try /tasks or /reptiles"
 
 
 # tasks
@@ -114,8 +150,9 @@ def get_reptiles():
     return jsonify(load_json(REPTILES_FILE))
 
 
-@app.get("/reptiles/<int:reptile_id>")
+@app.get("/api/reptiles/<int:reptile_id>")
 def get_reptile(reptile_id):
+
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     return jsonify(reptile or {"error": "Reptile not found"}), (200 if reptile else 404)
@@ -232,6 +269,8 @@ def frequency_to_interval_days(freq: str):
     return None  # unknown
 
 
+
+
 def compute_feed_status(last_fed_str: str, freq_str: str):
     """
     Returns: (status_key, label_text)
@@ -270,6 +309,7 @@ def reptiles_form():
         status_key, status_label = compute_feed_status(r.get("last_fed", ""), freq)
         r["feed_status_key"] = status_key
         r["feed_status_label"] = status_label
+        
 
     return render_template("reptiles_form.html", reptiles=reptiles)
 
@@ -290,21 +330,24 @@ def reptiles_form_post():
     except ValueError:
         weight_grams = None
 
+    last_fed = request.form.get("last_fed", "").strip()
+    freq = request.form.get("feed_frequency", "").strip()
+
     reptile = {
         "id": new_id(),
         "name": name,
         "species": species,
-        #includes field image for species
         "image_url": request.form.get("image_url", "").strip(),
         "appearance": request.form.get("appearance", "").strip(),
         "diet": request.form.get("diet", "").strip(),
         "weight_grams": weight_grams,
         "feeding_schedule": {
-            "frequency": request.form.get("feed_frequency", "").strip(),
+            "frequency": freq,
             "time_of_day": request.form.get("feed_time", "").strip(),
             "notes": request.form.get("feed_notes", "").strip(),
+            "next_feed_date": calc_next_feed_date(last_fed, freq),  # ✅ add this
         },
-        "last_fed": request.form.get("last_fed", "").strip(),
+        "last_fed": last_fed,
     }
 
     reptiles.append(reptile)
@@ -313,21 +356,33 @@ def reptiles_form_post():
     return redirect(url_for("reptile_view", reptile_id=reptile["id"]))
 
 
+
+@app.get("/reptiles/<int:reptile_id>")
+def reptile_view(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+
+    if not reptile:
+        return "Reptile not found", 404
+
+    # 🔹 calculate feed status BEFORE rendering template
+    reptile["feed_status"] = feed_status(
+        reptile.get("feeding_schedule", {}).get("next_feed_date", "")
+    )
+
+    return render_template("reptile_view.html", reptile=reptile)
+
 @app.get("/reptiles-ui")
 def reptiles_ui():
     return render_template("reptiles.html")
 
-@app.get("/reptiles/<int:reptile_id>/view")
-def reptile_view(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return "Reptile not found", 404
-    return render_template("reptile_view.html", reptile=reptile)
+@app.get("/")
+def home():
+    return redirect(url_for("reptiles_ui"))
 
 
 
-#adding 2 routes to app.py
+# adding 2 routes to app.py
 
 @app.get("/reptiles/<int:reptile_id>/edit")
 def edit_reptile_form(reptile_id):
@@ -357,20 +412,25 @@ def edit_reptile_post(reptile_id):
     try:
         reptile["weight_grams"] = float(weight_raw) if weight_raw else None
     except ValueError:
-        # keep old weight if invalid input
-        pass
+        pass  # keep old weight if invalid input
 
-    # Feeding schedule (ensure dict exists)
+    # Feeding schedule (ensure dict exists) + update fields FIRST
     reptile.setdefault("feeding_schedule", {})
     reptile["feeding_schedule"]["frequency"] = request.form.get("feed_frequency", "").strip()
     reptile["feeding_schedule"]["time_of_day"] = request.form.get("feed_time", "").strip()
     reptile["feeding_schedule"]["notes"] = request.form.get("feed_notes", "").strip()
 
-    save_json(REPTILES_FILE, reptiles)
+    #  calculate next feed date using the UPDATED frequency + last_fed
+    reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(
+        reptile.get("last_fed", ""),
+        reptile["feeding_schedule"].get("frequency", "")
+    )
 
+    save_json(REPTILES_FILE, reptiles)
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
-#food log POST route to save feeding entry
+
+# food log POST route to save feeding entry
 @app.post("/reptiles/<int:reptile_id>/feedings")
 def add_feeding(reptile_id):
     reptiles = load_json(REPTILES_FILE)
@@ -378,26 +438,26 @@ def add_feeding(reptile_id):
     if not reptile:
         return "Reptile not found", 404
 
-    date = request.form.get("date", "").strip()
+    feed_date = request.form.get("date", "").strip()
     food = request.form.get("food", "").strip()
     amount = request.form.get("amount", "").strip()
     notes = request.form.get("notes", "").strip()
 
     # Basic validation (date + food required)
-    if not date or not food:
+    if not feed_date or not food:
         return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
     reptile.setdefault("feeding_log", [])
     reptile["feeding_log"].append({
         "id": new_id(),
-        "date": date,
+        "date": feed_date,
         "food": food,
         "amount": amount,
         "notes": notes
     })
 
     # keep last_fed in sync automatically
-    reptile["last_fed"] = date
+    reptile["last_fed"] = feed_date
 
     save_json(REPTILES_FILE, reptiles)
     return redirect(url_for("reptile_view", reptile_id=reptile_id))

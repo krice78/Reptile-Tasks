@@ -29,6 +29,16 @@
           <div><b>Diet:</b> {{ reptile.diet }}</div>
           <div><b>Weight (g):</b> {{ reptile.weight_grams }}</div>
           <div><b>Last fed:</b> {{ reptile.last_fed }}</div>
+          {% set next_date = reptile.get('feeding_schedule', {}).get('next_feed_date', '') %}
+
+        <div><b>Next feed date:</b>
+          {% if next_date %}
+            <span class="feed-status feed-{{ reptile.feed_status }}">{{ next_date }}</span>
+          {% else %}
+            <span class="subtle">Not set</span>
+          {% endif %}
+        </div>
+
           <div><b>Feeding frequency:</b> {{ reptile.feeding_schedule.frequency }}</div>
           <div><b>Time of day:</b> {{ reptile.feeding_schedule.time_of_day }}</div>
           <div><b>Notes:</b> {{ reptile.feeding_schedule.notes }}</div>
