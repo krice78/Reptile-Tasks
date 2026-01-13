@@ -240,7 +240,8 @@ def frequency_to_interval_days(freq: str):
     Convert a human frequency string into an interval in days.
     You can expand this mapping anytime.
     """
-    f = (freq or "").strip().lower()
+    f = (freq or "").strip().lower().replace("_", " ")
+
 
     # common phrases
     if "daily" in f or "every day" in f:
@@ -313,7 +314,21 @@ def reptiles_form():
 
     return render_template("reptiles_form.html", reptiles=reptiles)
 
+#delete reptile route for ui
+@app.post("/reptiles/<int:reptile_id>/delete")
+def delete_reptile_ui(reptile_id):
+    reptiles = load_json(REPTILES_FILE)
+    new_reptiles = [r for r in reptiles if r.get("id") != reptile_id]
 
+    # If not found, just go back to list
+    if len(new_reptiles) == len(reptiles):
+        return redirect(url_for("reptiles_form"))
+
+    save_json(REPTILES_FILE, new_reptiles)
+    return redirect(url_for("reptiles_form"))
+
+
+# POST route to handle reptile form submission
 @app.post("/reptiles-form")
 def reptiles_form_post():
     reptiles = load_json(REPTILES_FILE)
@@ -356,7 +371,7 @@ def reptiles_form_post():
     return redirect(url_for("reptile_view", reptile_id=reptile["id"]))
 
 
-
+# reptile detail view route
 @app.get("/reptiles/<int:reptile_id>")
 def reptile_view(reptile_id):
     reptiles = load_json(REPTILES_FILE)
@@ -365,10 +380,10 @@ def reptile_view(reptile_id):
     if not reptile:
         return "Reptile not found", 404
 
-    # ✅ ensure feeding_schedule exists
+    # ensure feeding_schedule exists
     reptile.setdefault("feeding_schedule", {})
 
-    # ✅ compute next_feed_date if missing/blank (helps older reptiles)
+    # compute next_feed_date if missing/blank (helps older reptiles)
     if not reptile["feeding_schedule"].get("next_feed_date"):
         last_fed = reptile.get("last_fed", "")
         freq = reptile["feeding_schedule"].get("frequency", "")

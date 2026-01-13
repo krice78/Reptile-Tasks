@@ -1,168 +1,5 @@
 [
   {
-    "id": 1768160770497,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-01-02",
-    "feeding_log": [
-      {
-        "id": 1768180230170,
-        "date": "2026-01-02",
-        "food": "Fuzzies",
-        "amount": "2",
-        "notes": "ate all"
-      }
-    ]
-  },
-  {
-    "id": 1768160851663,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-01-07",
-    "feeding_log": [
-      {
-        "id": 1768265750702,
-        "date": "2026-01-07",
-        "food": "Fuzzies",
-        "amount": "2",
-        "notes": "ate all"
-      }
-    ]
-  },
-  {
-    "id": 1768160855608,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
-    "id": 1768160869524,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
-    "id": 1768160873168,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
-    "id": 1768161986336,
-    "name": "Nirah",
-    "species": "Nelson's Albino Milk Snake",
-    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
-    "appearance": "Orange, White, Yellow stripes",
-    "diet": "Fuzzies",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "2 fuzzies"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
-    "id": 1768165896256,
-    "name": "otto",
-    "species": "crested",
-    "image_url": "https://www.avianexotichospital.com/uploads/1/0/4/8/104851457/crestedgecko_orig.jpg",
-    "appearance": "yellow, light brown, grayish, no tail frog butt :)",
-    "diet": "rapashi, insects",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "Rapashi twice per week, insects 1-2 times per week",
-      "time_of_day": "evening",
-      "notes": "crickets and dubia roaches, she does not like worms, like mango and cherry rapashi"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
-    "id": 1768166272700,
-    "name": "Guppy",
-    "species": "African Fat Tail Gecko",
-    "image_url": "https://www.reptilecymru.co.uk/wp-content/uploads/2021/04/African-Fat-Tailed-Gecko.png",
-    "appearance": "brown",
-    "diet": "insects",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "twice weekly",
-      "time_of_day": "evening",
-      "notes": "likes crickets the most"
-    },
-    "last_fed": "2026-01-08",
-    "feeding_log": [
-      {
-        "id": 1768171690884,
-        "date": "2026-01-08",
-        "food": "Crickets",
-        "amount": "6",
-        "notes": "ate all"
-      }
-    ]
-  },
-  {
-    "id": 1768266651407,
-    "name": "Vinny",
-    "species": "Vinegaroon",
-    "image_url": "data:image/jpeg;base64,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",
-    "appearance": "black and dark brown",
-    "diet": "insects",
-    "weight_grams": 0.0,
-    "feeding_schedule": {
-      "frequency": "weekly",
-      "time_of_day": "evening",
-      "notes": "crickets and dubia roaches",
-      "next_feed_date": "2026-07-08"
-    },
-    "last_fed": "2026-07-01"
-  },
-  {
     "id": 1768269535281,
     "name": "Ed, Edd, Eddy, & Dot",
     "species": "White's Tree Frogs",
@@ -186,5 +23,37 @@
         "notes": "ate all"
       }
     ]
+  },
+  {
+    "id": 1768270684877,
+    "name": "Guppy",
+    "species": "African Fat Tail Gecko",
+    "image_url": "https://www.reptilecymru.co.uk/wp-content/uploads/2021/04/African-Fat-Tailed-Gecko.png",
+    "appearance": "brown and orange",
+    "diet": "insects",
+    "weight_grams": 0.0,
+    "feeding_schedule": {
+      "frequency": "every_3_days",
+      "time_of_day": "evening",
+      "notes": "likes crickets the most",
+      "next_feed_date": "2026-01-13"
+    },
+    "last_fed": "2026-01-10"
+  },
+  {
+    "id": 1768272366210,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": null,
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies",
+      "next_feed_date": "2026-01-14"
+    },
+    "last_fed": "2026-01-07"
   }
 ]
