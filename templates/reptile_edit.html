@@ -45,7 +45,19 @@
 
           <div class="row">
             <label>Feeding Frequency</label>
-            <input name="feed_frequency" value="{{ reptile.feeding_schedule.frequency if reptile.feeding_schedule else '' }}" />
+            {% set current_freq = reptile.feeding_schedule.frequency if reptile.feeding_schedule else '' %}
+
+            <select id="feed_frequency" name="feed_frequency" class="pretty-select" required>
+              <option value="" disabled {{ 'selected' if not current_freq else '' }}>Select frequency</option>
+
+              <option value="daily" {{ 'selected' if current_freq == 'daily' else '' }}>Daily</option>
+              <option value="every_other_day" {{ 'selected' if current_freq == 'every_other_day' else '' }}>Every other day</option>
+              <option value="every_3_days" {{ 'selected' if current_freq == 'every_3_days' else '' }}>Every 3 days</option>
+              <option value="weekly" {{ 'selected' if current_freq == 'weekly' else '' }}>Weekly</option>
+              <option value="biweekly" {{ 'selected' if current_freq == 'biweekly' else '' }}>Every 2 weeks</option>
+              <option value="monthly" {{ 'selected' if current_freq == 'monthly' else '' }}>Monthly</option>
+            </select>
+
           </div>
 
           <div class="row">

@@ -129,3 +129,88 @@ th, td {
   border-color: #d6dbe3;
   color: #4a5568;
 }
+
+/* .pretty-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #d9e6df;
+  background-color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2f4f4f;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg fill='%238bc6a8' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 20px;
+
+  transition: all 0.25s ease;
+}
+
+.pretty-select:hover {
+  border-color: #8bc6a8;
+}
+
+.pretty-select:focus {
+  outline: none;
+  border-color: #5fae8a;
+  box-shadow: 0 0 0 3px rgba(95,174,138,0.25);
+}
+
+label {
+  font-weight: 600;
+  color: #3b5c50;
+  margin-bottom: 6px;
+  display: block;
+} */
+
+/* select.pretty-select {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #d9e6df;
+  background-color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2f4f4f;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg fill='%238bc6a8' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 20px;
+} */
+ select.pretty-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #d9e6df;
+  background-color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2f4f4f;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg fill='%238bc6a8' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 20px;
+
+  transition: all 0.25s ease;
+}
