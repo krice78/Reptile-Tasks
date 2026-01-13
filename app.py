@@ -365,12 +365,23 @@ def reptile_view(reptile_id):
     if not reptile:
         return "Reptile not found", 404
 
-    # 🔹 calculate feed status BEFORE rendering template
+    # ✅ ensure feeding_schedule exists
+    reptile.setdefault("feeding_schedule", {})
+
+    # ✅ compute next_feed_date if missing/blank (helps older reptiles)
+    if not reptile["feeding_schedule"].get("next_feed_date"):
+        last_fed = reptile.get("last_fed", "")
+        freq = reptile["feeding_schedule"].get("frequency", "")
+        reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(last_fed, freq)
+        save_json(REPTILES_FILE, reptiles)  # keeps it saved
+
+    # 🔹 calculate feed status
     reptile["feed_status"] = feed_status(
-        reptile.get("feeding_schedule", {}).get("next_feed_date", "")
+        reptile["feeding_schedule"].get("next_feed_date", "")
     )
 
     return render_template("reptile_view.html", reptile=reptile)
+
 
 @app.get("/reptiles-ui")
 def reptiles_ui():
