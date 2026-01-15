@@ -4,6 +4,8 @@
     <title>Dashboard</title>
 </head>
 <body>
+    {% include "_header.html" %}
+
     <h1>Welcome {{ current_user.username }}</h1>
 
     <a href="{{ url_for('reptiles_form') }}">View Reptiles</a><br>

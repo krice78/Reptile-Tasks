@@ -1,0 +1,16 @@
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="{{ url_for('index') }}" class="nav-btn">🏠 Dashboard</a>
+    <a href="{{ url_for('reptiles_form') }}" class="nav-btn">🦎 Reptiles</a>
+  </div>
+
+  <div class="topbar-right">
+    {% if current_user.is_authenticated %}
+      <span class="user-pill">Signed in as <b>{{ current_user.username }}</b></span>
+      <a href="{{ url_for('logout') }}" class="nav-btn logout">🚪 Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="nav-btn">Log in</a>
+      <a href="{{ url_for('register') }}" class="nav-btn">Register</a>
+    {% endif %}
+  </div>
+</div>

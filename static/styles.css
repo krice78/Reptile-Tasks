@@ -222,3 +222,39 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   gap: 10px;
   white-space: nowrap;
 }
+
+/*  header styles  */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.topbar-left, .topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #eef2f7;
+  color: #222;
+  font-weight: 600;
+}
+
+.nav-btn:hover { filter: brightness(0.97); }
+
+.user-pill {
+  background: #f6f7fb;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #e6e8ef;
+}
+
+.logout { background: #ffe5e5; }

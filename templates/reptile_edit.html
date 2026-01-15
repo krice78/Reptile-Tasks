@@ -7,6 +7,8 @@
   </head>
 
   <body>
+    {% include "_header.html" %}
+
     <div class="container">
       <div class="card">
         <a href="{{ url_for('reptile_view', reptile_id=reptile.id) }}" class="subtle">← Back to details</a>
