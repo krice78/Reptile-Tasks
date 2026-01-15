@@ -4,7 +4,10 @@
     <title>Register</title>
 </head>
 <body>
-    {% include "_header.html" %}
+    {% include "header.html" %}
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
 
     <h1>Create Account</h1>
 

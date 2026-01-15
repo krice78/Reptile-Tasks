@@ -258,3 +258,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 }
 
 .logout { background: #ffe5e5; }
+
+
+.error {
+  background: #ffe5e5;
+  border: 1px solid #ffcccc;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}

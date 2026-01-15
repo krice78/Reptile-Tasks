@@ -185,7 +185,8 @@ def get_reptiles():
 @login_required
 def get_reptile(reptile_id):
 
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     return jsonify(reptile or {"error": "Reptile not found"}), (200 if reptile else 404)
 
@@ -193,7 +194,8 @@ def get_reptile(reptile_id):
 @app.post("/reptiles")
 @login_required
 def create_reptile():
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     data = request.get_json(silent=True) or {}
 
     ok, msg = validate_reptile_payload(data, partial=False)
@@ -223,7 +225,8 @@ def create_reptile():
 @app.put("/reptiles/<int:reptile_id>")
 @login_required
 def update_reptile(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return jsonify({"error": "Reptile not found"}), 404
@@ -249,7 +252,8 @@ def update_reptile(reptile_id):
 @app.delete("/reptiles/<int:reptile_id>")
 @login_required
 def delete_reptile(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     new_reptiles = [r for r in reptiles if r["id"] != reptile_id]
 
     if len(reptiles) == len(new_reptiles):
@@ -337,9 +341,14 @@ def register():
     if request.method == "POST":
         username = request.form["username"].strip().lower()
         password = request.form["password"]
+        
+        if not username or not password:
+            return render_template("register.html", error="Username and password are required.")
+
 
         if User.query.filter_by(username=username).first():
-            return "Username already exists"
+            return render_template("register.html", error="That username is already taken.")
+
 
         user = User(
             username=username,
@@ -355,18 +364,22 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"].strip().lower()
-        password = request.form["password"]
+        username = request.form.get("username", "").strip().lower()
+        password = request.form.get("password", "")
+        remember = request.form.get("remember") == "1"
+
+        if not username or not password:
+            return render_template("login.html", error="Username and password are required.")
 
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password_hash, password):
-            return render_template("login.html", error="Invalid username or password")
+            return render_template("login.html", error="Invalid username or password.")
 
-
-        login_user(user)
+        login_user(user, remember=remember)
         return redirect(url_for("index"))
 
     return render_template("login.html")
+
 
 
 @app.route("/")
@@ -411,7 +424,8 @@ def logout():
 @app.get("/reptiles-form")
 @login_required
 def reptiles_form():
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
 
     for r in reptiles:
         freq = ""
@@ -429,7 +443,8 @@ def reptiles_form():
 @app.post("/reptiles/<int:reptile_id>/delete")
 @login_required
 def delete_reptile_ui(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     new_reptiles = [r for r in reptiles if r.get("id") != reptile_id]
 
     # If not found, just go back to list
@@ -444,7 +459,8 @@ def delete_reptile_ui(reptile_id):
 @app.post("/reptiles-form")
 @login_required
 def reptiles_form_post():
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     
 
 
@@ -491,7 +507,8 @@ def reptiles_form_post():
 @app.get("/reptiles/<int:reptile_id>")
 @login_required
 def reptile_view(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
 
     if not reptile:
@@ -531,7 +548,8 @@ def reptiles_ui():
 @app.get("/reptiles/<int:reptile_id>/edit")
 @login_required
 def edit_reptile_form(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return "Reptile not found", 404
@@ -541,7 +559,8 @@ def edit_reptile_form(reptile_id):
 @app.post("/reptiles/<int:reptile_id>/edit")
 @login_required
 def edit_reptile_post(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return "Reptile not found", 404
@@ -580,7 +599,8 @@ def edit_reptile_post(reptile_id):
 @app.post("/reptiles/<int:reptile_id>/feedings")
 @login_required
 def add_feeding(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return "Reptile not found", 404
@@ -613,7 +633,8 @@ def add_feeding(reptile_id):
 @app.get("/debug/reptile-view/<int:reptile_id>")
 @login_required
 def debug_reptile_view(reptile_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return "Reptile not found", 404
@@ -627,7 +648,8 @@ def debug_reptile_view(reptile_id):
 @app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/delete")
 @login_required
 def delete_feeding(reptile_id, feeding_id):
-    reptiles = load_json(REPTILES_FILE)
+    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
     if not reptile:
         return "Reptile not found", 404
