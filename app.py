@@ -675,8 +675,8 @@ def delete_feeding(reptile_id, feeding_id):
 
 
 #run once then comment out
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 
 #last line only
