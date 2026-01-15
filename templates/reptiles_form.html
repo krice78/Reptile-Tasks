@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <title>Reptile Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <div class="nav-bar">
+      <a href="{{ url_for('index') }}" class="nav-btn">🏠 Dashboard</a>
+      <a href="{{ url_for('logout') }}" class="nav-btn logout">🚪 Logout</a>
+    </div>
+
 
     <style>
       body { font-family: Arial, sans-serif; padding: 20px; background: #f6f7fb; }

@@ -55,5 +55,22 @@
       "next_feed_date": "2026-01-14"
     },
     "last_fed": "2026-01-07"
+  },
+  {
+    "id": 1768511294869,
+    "user_id": 2,
+    "name": "Nirah",
+    "species": "African Fat Tail Gecko",
+    "image_url": "https://www.avianexotichospital.com/uploads/1/0/4/8/104851457/crestedgecko_orig.jpg",
+    "appearance": "",
+    "diet": "",
+    "weight_grams": null,
+    "feeding_schedule": {
+      "frequency": "every_other_day",
+      "time_of_day": "",
+      "notes": "",
+      "next_feed_date": ""
+    },
+    "last_fed": ""
   }
 ]

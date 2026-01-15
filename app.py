@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "change-me"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///reptiles.db"
 db = SQLAlchemy(app)
 
@@ -36,7 +36,8 @@ class Animal(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
+
 
 # Feeding frequency to days mapping
 FREQ_TO_DAYS = {
@@ -181,6 +182,7 @@ def get_reptiles():
 
 
 @app.get("/api/reptiles/<int:reptile_id>")
+@login_required
 def get_reptile(reptile_id):
 
     reptiles = load_json(REPTILES_FILE)
@@ -333,7 +335,7 @@ def compute_feed_status(last_fed_str: str, freq_str: str):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"].strip()
+        username = request.form["username"].strip().lower()
         password = request.form["password"]
 
         if User.query.filter_by(username=username).first():
@@ -353,12 +355,13 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"].strip()
+        username = request.form["username"].strip().lower()
         password = request.form["password"]
 
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password_hash, password):
-            return "Invalid credentials"
+            return render_template("login.html", error="Invalid username or password")
+
 
         login_user(user)
         return redirect(url_for("index"))
@@ -442,6 +445,8 @@ def delete_reptile_ui(reptile_id):
 @login_required
 def reptiles_form_post():
     reptiles = load_json(REPTILES_FILE)
+    
+
 
     name = request.form.get("name", "").strip()
     species = request.form.get("species", "").strip()
@@ -460,6 +465,7 @@ def reptiles_form_post():
 
     reptile = {
         "id": new_id(),
+        "user_id": current_user.id,
         "name": name,
         "species": species,
         "image_url": request.form.get("image_url", "").strip(),
