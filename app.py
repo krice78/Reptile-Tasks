@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import os
 import time
@@ -7,10 +9,34 @@ from datetime import date, datetime, timedelta
 
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "change-me"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///reptiles.db"
+db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.login_view = "login"
+login_manager.init_app(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TASKS_FILE = os.path.join(BASE_DIR, "tasks.json")
 REPTILES_FILE = os.path.join(BASE_DIR, "reptiles.json")
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+
+class Animal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    species = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Feeding frequency to days mapping
 FREQ_TO_DAYS = {
@@ -89,6 +115,7 @@ def get_task(task_id):
 
 
 @app.post("/tasks")
+@login_required
 def create_task():
     tasks = load_json(TASKS_FILE)
     data = request.get_json(silent=True) or {}
@@ -105,6 +132,7 @@ def create_task():
 
 
 @app.put("/tasks/<int:task_id>")
+@login_required
 def update_task(task_id):
     tasks = load_json(TASKS_FILE)
     task = next((t for t in tasks if t["id"] == task_id), None)
@@ -120,6 +148,7 @@ def update_task(task_id):
 
 
 @app.delete("/tasks/<int:task_id>")
+@login_required
 def delete_task(task_id):
     tasks = load_json(TASKS_FILE)
     new_tasks = [t for t in tasks if t["id"] != task_id]
@@ -146,6 +175,7 @@ def validate_reptile_payload(data, partial=False):
 
 
 @app.get("/reptiles")
+@login_required
 def get_reptiles():
     return jsonify(load_json(REPTILES_FILE))
 
@@ -159,6 +189,7 @@ def get_reptile(reptile_id):
 
 
 @app.post("/reptiles")
+@login_required
 def create_reptile():
     reptiles = load_json(REPTILES_FILE)
     data = request.get_json(silent=True) or {}
@@ -188,6 +219,7 @@ def create_reptile():
 
 
 @app.put("/reptiles/<int:reptile_id>")
+@login_required
 def update_reptile(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -213,6 +245,7 @@ def update_reptile(reptile_id):
 
 
 @app.delete("/reptiles/<int:reptile_id>")
+@login_required
 def delete_reptile(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     new_reptiles = [r for r in reptiles if r["id"] != reptile_id]
@@ -295,10 +328,85 @@ def compute_feed_status(last_fed_str: str, freq_str: str):
         return "due", "Due soon"
     return "ok", f"OK ({days_until}d)"
 
+#login and log out routes
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        password = request.form["password"]
+
+        if User.query.filter_by(username=username).first():
+            return "Username already exists"
+
+        user = User(
+            username=username,
+            password_hash=generate_password_hash(password)
+        )
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        return redirect(url_for("index"))
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        password = request.form["password"]
+
+        user = User.query.filter_by(username=username).first()
+        if not user or not check_password_hash(user.password_hash, password):
+            return "Invalid credentials"
+
+        login_user(user)
+        return redirect(url_for("index"))
+
+    return render_template("login.html")
+
+
+@app.route("/")
+@login_required
+def index():
+    animals = Animal.query.filter_by(user_id=current_user.id).all()
+    return render_template("index.html", animals=animals)
+
+@app.route("/add", methods=["GET", "POST"])
+@login_required
+def add_animal():
+    if request.method == "POST":
+        animal = Animal(
+            name=request.form["name"],
+            species=request.form["species"],
+            description=request.form["description"],
+            user_id=current_user.id
+        )
+        db.session.add(animal)
+        db.session.commit()
+        return redirect(url_for("index"))
+
+    return render_template("add.html")
+
+
+@app.route("/animal/<int:animal_id>")
+@login_required
+def animal_detail(animal_id):
+    animal = Animal.query.filter_by(id=animal_id, user_id=current_user.id).first_or_404()
+    return render_template("detail.html", animal=animal)
+
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
 # routes to reptile form
 
 @app.get("/reptiles-form")
+@login_required
 def reptiles_form():
     reptiles = load_json(REPTILES_FILE)
 
@@ -316,6 +424,7 @@ def reptiles_form():
 
 #delete reptile route for ui
 @app.post("/reptiles/<int:reptile_id>/delete")
+@login_required
 def delete_reptile_ui(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     new_reptiles = [r for r in reptiles if r.get("id") != reptile_id]
@@ -330,6 +439,7 @@ def delete_reptile_ui(reptile_id):
 
 # POST route to handle reptile form submission
 @app.post("/reptiles-form")
+@login_required
 def reptiles_form_post():
     reptiles = load_json(REPTILES_FILE)
 
@@ -373,6 +483,7 @@ def reptiles_form_post():
 
 # reptile detail view route
 @app.get("/reptiles/<int:reptile_id>")
+@login_required
 def reptile_view(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -402,15 +513,17 @@ def reptile_view(reptile_id):
 def reptiles_ui():
     return render_template("reptiles.html")
 
-@app.get("/")
-def home():
-    return redirect(url_for("reptiles_ui"))
+#home page redirect to reptiles ui
+# @app.get("/")
+# def home():
+#     return redirect(url_for("reptiles_ui"))
 
 
 
 # adding 2 routes to app.py
 
 @app.get("/reptiles/<int:reptile_id>/edit")
+@login_required
 def edit_reptile_form(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -420,6 +533,7 @@ def edit_reptile_form(reptile_id):
 
 
 @app.post("/reptiles/<int:reptile_id>/edit")
+@login_required
 def edit_reptile_post(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -458,6 +572,7 @@ def edit_reptile_post(reptile_id):
 
 # food log POST route to save feeding entry
 @app.post("/reptiles/<int:reptile_id>/feedings")
+@login_required
 def add_feeding(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -490,6 +605,7 @@ def add_feeding(reptile_id):
 
 #debug reptile view
 @app.get("/debug/reptile-view/<int:reptile_id>")
+@login_required
 def debug_reptile_view(reptile_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -503,6 +619,7 @@ def debug_reptile_view(reptile_id):
 #delete feeding entry
 
 @app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/delete")
+@login_required
 def delete_feeding(reptile_id, feeding_id):
     reptiles = load_json(REPTILES_FILE)
     reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
@@ -527,6 +644,11 @@ def delete_feeding(reptile_id, feeding_id):
 
     save_json(REPTILES_FILE, reptiles)
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
+
+
+#run once then comment out
+with app.app_context():
+    db.create_all()
 
 
 #last line only
