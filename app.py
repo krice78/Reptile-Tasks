@@ -357,7 +357,8 @@ def register():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        return redirect(url_for("index"))
+        return redirect(url_for("dashboard"))
+
 
     return render_template("register.html")
 
@@ -376,7 +377,8 @@ def login():
             return render_template("login.html", error="Invalid username or password.")
 
         login_user(user, remember=remember)
-        return redirect(url_for("index"))
+        return redirect(url_for("dashboard"))
+
 
     return render_template("login.html")
 
@@ -400,7 +402,8 @@ def add_animal():
         )
         db.session.add(animal)
         db.session.commit()
-        return redirect(url_for("index"))
+        return redirect(url_for("dashboard"))
+
 
     return render_template("add.html")
 
@@ -537,9 +540,14 @@ def reptiles_ui():
     return render_template("reptiles.html")
 
 #home page redirect to reptiles ui
-# @app.get("/")
-# def home():
-#     return redirect(url_for("reptiles_ui"))
+@app.get("/")
+def landing():
+    return render_template("landing.html")
+
+@app.get("/dashboard")
+@login_required
+def dashboard():
+    return redirect(url_for("reptiles_form"))
 
 
 
