@@ -384,11 +384,10 @@ def login():
 
 
 
-@app.route("/")
-@login_required
-def index():
-    animals = Animal.query.filter_by(user_id=current_user.id).all()
-    return render_template("index.html", animals=animals)
+# @app.route("/")
+# def landing():
+#     animals = Animal.query.filter_by(user_id=current_user.id).all()
+#     return render_template("landing.html", animals=animals)
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
@@ -539,7 +538,6 @@ def reptile_view(reptile_id):
 def reptiles_ui():
     return render_template("reptiles.html")
 
-#home page redirect to reptiles ui
 @app.get("/")
 def landing():
     return render_template("landing.html")
@@ -548,6 +546,7 @@ def landing():
 @login_required
 def dashboard():
     return redirect(url_for("reptiles_form"))
+
 
 
 
