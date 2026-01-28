@@ -1,3 +1,4 @@
+/* 1. VARIABLES & THEME */
 :root {
     --bg-dark: #0f172a;
     --card-bg: #1e293b;
@@ -7,44 +8,87 @@
     --border: #334155;
 }
 
+/* 2. GLOBAL RESET & BODY */
 * { box-sizing: border-box; }
-
-/* The main wrapper for your header content */
-.topbar {
-    display: flex;
-    justify-content: space-between; /* This is the secret for right-aligning */
-    align-items: center;
-    width: 100%;
-    margin-bottom: 24px;
-}
-
-/* Groups the Logo/Name on the left */
-.topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Groups the Nav links and Logout on the right */
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* Optional: Make the Logout button stand out but stay aligned */
-.logout { 
-    background-color: #ef4444; Red color from your landing page style
-    color: white;
-    margin-top: 0; Ensures it doesn't jump out of alignment
- }
 
 body {
     background-color: var(--bg-dark) !important;
     color: var(--text-main);
     font-family: system-ui, -apple-system, sans-serif;
     margin: 0;
+    padding: 0;
 }
+
+/* 3. LAYOUT CONTAINERS */
+.container {
+    width: min(95vw, 1200px);
+    margin: 0 auto;
+    padding: 40px 32px; /* Increased top padding for better spacing */
+}
+
+/* 4. TOP NAVIGATION BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 40px; /* The "perfect gap" logic */
+    margin-top: 10px;
+    padding: 0 10px;
+}
+
+.topbar-left, 
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-pill {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+.user-pill b {
+    color: var(--text-main);
+}
+
+/* 5. LINKS & GLOBAL INTERACTION */
+a {
+    color: var(--accent-teal);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+a:visited {
+    color: var(--accent-teal);
+}
+
+a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.subtle { color: var(--text-muted); }
+.subtle:visited { color: var(--text-muted); }
+
+/* 6. BUTTONS */
+button, .btn {
+    background: var(--accent-teal);
+    color: #0f172a;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+button:hover { transform: translateY(-1px); }
 
 .btn-secondary {
     background: transparent;
@@ -59,40 +103,39 @@ body {
 }
 
 .btn-secondary:hover {
-    background: rgba(16, 185, 129, 0.1); /* Subtle green glow on hover */
+    background: rgba(16, 185, 129, 0.1);
     color: var(--text-main);
 }
 
-/* All links throughout the app */
-a {
-    color: var(--accent-teal);
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    background: transparent !important;
+    color: #f87171 !important;
+    border: 1px solid #f87171 !important;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
     text-decoration: none;
-    transition: opacity 0.2s;
+    transition: all 0.2s;
+    cursor: pointer;
 }
 
-/* This is the specific fix for "used" links */
-a:visited {
-    color: var(--accent-teal); /* Keeps it teal even after clicking */
+.btn-logout:hover {
+    background: rgba(248, 113, 113, 0.1) !important;
+    color: #ff9999 !important;
 }
 
-/* Add a subtle hover effect so it feels interactive */
-a:hover {
-    opacity: 0.8;
-    text-decoration: underline;
+.nav-btn {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 10px;
 }
 
-/* For specific subtle links like "Cancel" or "Back" */
-.subtle:visited {
-    color: var(--text-muted);
-}
-
-.container {
-    width: min(95vw, 1200px);
-    margin: 0 auto;
-    padding: 24px;
-}
-
-/* Updated Card to match landing page previews */
+/* 7. CARDS & FORMS */
 .card {
     background: var(--card-bg);
     border-radius: 16px;
@@ -101,9 +144,6 @@ a:hover {
     margin-bottom: 20px;
 }
 
-.subtle { color: var(--text-muted); }
-
-/* Dark mode inputs */
 input, select, textarea, .pretty-select {
     background-color: #0f172a;
     color: var(--text-main);
@@ -114,46 +154,21 @@ input, select, textarea, .pretty-select {
     width: 100%;
 }
 
-/* Matching the "Get Started" teal button */
-button, .btn {
-    background: var(--accent-teal);
-    color: #0f172a;
-    padding: 10px 20px;
-    border: 0;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
-
-button:hover { transform: translateY(-1px); }
-
-/* Navigation adjustments */
-.nav-btn {
-    background: var(--card-bg);
-    color: var(--text-main);
-    border: 1px solid var(--border);
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 10px;
-}
-
-/* Styling the clickable 'Add a New Reptile' bar */
+/* 8. DROP DOWNS / DETAILS */
 .dropdown-header {
     cursor: pointer;
     padding: 12px 20px;
-    background-color: var(--card-bg); /* Matches your cards */
+    background-color: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     font-weight: 600;
-    list-style: none; /* Removes the default arrow in some browsers */
+    list-style: none;
 }
 
 .dropdown-header:hover {
-    background-color: #2d3748; /* Slightly lighter on hover */
+    background-color: #2d3748;
 }
 
-/* Ensure the form inside doesn't look squished */
 .inline-form {
     display: flex;
     gap: 15px;
@@ -161,7 +176,4 @@ button:hover { transform: translateY(-1px); }
 }
 
 .inline-form input {
-    flex: 1;
-    min-width: 150px;
-}
-
+    flex
