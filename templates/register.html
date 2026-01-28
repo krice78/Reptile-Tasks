@@ -2,25 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <title>Create Account | Critter Tracker</title>
+=======
+    <title>Register | Critter Tracker</title>
+>>>>>>> Main
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     {% include "header.html" %}
 
+<<<<<<< HEAD
     <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
         
         {% if error %}
             <div class="card" style="border: 1px solid #f87171; background: rgba(248, 113, 113, 0.1); color: #f87171; margin-bottom: 20px; width: 100%; max-width: 400px; text-align: center;">
+=======
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh;">
+        
+        {% if error %}
+            <div class="card" style="border-color: #f87171; color: #f87171; margin-bottom: 20px; padding: 15px;">
+>>>>>>> Main
                 ⚠️ {{ error }}
             </div>
         {% endif %}
 
         <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+<<<<<<< HEAD
             <h1 style="margin-bottom: 10px;">Create Account</h1>
             <p class="subtle" style="margin-bottom: 30px;">Join the reptile community today</p>
 
             <form method="POST" action="{{ url_for('register') }}">
+=======
+            <h1 style="margin-bottom: 24px; font-size: 1.8rem;">Create Account</h1>
+
+            <form method="post" action="{{ url_for('register') }}">
+>>>>>>> Main
                 <div style="text-align: left; margin-bottom: 15px;">
                     <label class="subtle">Username</label>
                     <input type="text" name="username" placeholder="Choose a username" required>
@@ -28,7 +45,11 @@
 
                 <div style="text-align: left; margin-bottom: 20px;">
                     <label class="subtle">Password</label>
+<<<<<<< HEAD
                     <input type="password" name="password" placeholder="Create a strong password" required>
+=======
+                    <input type="password" name="password" placeholder="Create a password" required>
+>>>>>>> Main
                 </div>
 
                 <button type="submit" class="btn" style="width: 100%;">Register</button>
