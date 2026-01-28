@@ -34,7 +34,6 @@
 
 /* Optional: Make the Logout button stand out but stay aligned */
 .logout {
-    background-color: #ef4444; /* Red color from your landing page style */
     color: white;
     margin-top: 0; /* Ensures it doesn't jump out of alignment */
 }
