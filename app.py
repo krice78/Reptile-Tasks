@@ -209,7 +209,7 @@ def edit_reptile_post(reptile_id):
     if not reptile:
         return "Reptile not found", 404
 
-# 1. Update Basic Info 
+# Update Basic Info 
     reptile["name"] = request.form.get("name", "").strip()
     reptile["species"] = request.form.get("species", "").strip()
     reptile["image_url"] = request.form.get("image_url", "").strip()
@@ -217,14 +217,14 @@ def edit_reptile_post(reptile_id):
     reptile["diet"] = request.form.get("diet", "").strip()
     reptile["last_fed"] = request.form.get("last_fed", "").strip()
     
-    # 2. Update Weight (with safety check) 
+    # Update Weight (with safety check) 
     weight_raw = request.form.get("weight_grams", "").strip()
     try:
         reptile["weight_grams"] = float(weight_raw) if weight_raw else 0.0
     except ValueError:
         pass 
 
-    # 3. Update Feeding Schedule & Recalculate Next Date 
+    # Update Feeding Schedule & Recalculate Next Date 
     freq = request.form.get("feed_frequency", "").strip()
     reptile["feeding_schedule"] = {
         "frequency": freq,
