@@ -1,28 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <title>Create Account | Critter Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     {% include "header.html" %}
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
 
-    <h1>Create Account</h1>
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+        
+        {% if error %}
+            <div class="card" style="border: 1px solid #f87171; background: rgba(248, 113, 113, 0.1); color: #f87171; margin-bottom: 20px; width: 100%; max-width: 400px; text-align: center;">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
 
-    <form method="post">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+            <h1 style="margin-bottom: 10px;">Create Account</h1>
+            <p class="subtle" style="margin-bottom: 30px;">Join the reptile community today</p>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            <form method="POST" action="{{ url_for('register') }}">
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label class="subtle">Username</label>
+                    <input type="text" name="username" placeholder="Choose a username" required>
+                </div>
 
-        <button type="submit">Register</button>
-    </form>
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <label class="subtle">Password</label>
+                    <input type="password" name="password" placeholder="Create a strong password" required>
+                </div>
 
-    <p>Already have an account?  
-        <a href="{{ url_for('login') }}">Login here</a>
-    </p>
+                <button type="submit" class="btn" style="width: 100%;">Register</button>
+            </form>
+
+            <div class="subtle" style="margin-top: 25px;">
+                Already have an account?  
+                <a href="{{ url_for('login') }}">Login here</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

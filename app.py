@@ -118,12 +118,24 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        username = request.form["username"].lower()
+        
+        # 1. Check if username already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            # Send them back to the page with a friendly error message
+            return render_template("register.html", error="That username is already taken.")
+
+        # 2. If it doesn't exist, proceed as normal
         hashed = generate_password_hash(request.form["password"])
-        new_user = User(username=request.form["username"].lower(), password_hash=hashed)
+        new_user = User(username=username, password_hash=hashed)
+        
         db.session.add(new_user)
         db.session.commit()
+        
         login_user(new_user)
         return redirect(url_for("my_reptiles"))
+        
     return render_template("register.html")
 
 @app.route("/dashboard")
