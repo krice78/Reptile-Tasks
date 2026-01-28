@@ -1,293 +1,71 @@
 :root {
-    --bg-dark: #0f172a;       /* The deep navy background */
-    --card-bg: #1e293b;     /* The lighter gray-blue for cards */
-    --accent-teal: #10b981;   /* The "Get started" button green */
-    --text-main: #f8fafc;     /* Off-white text */
-    --text-muted: #94a3b8;    /* Gray text for labels */
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --accent-teal: #10b981;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
 }
+
+* { box-sizing: border-box; }
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
-    font-family: 'Inter', sans-serif; /* Clean font */
-}
-
-
-* { box-sizing: border-box; }
-body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  margin: 0;
-  background: #f6f7fb;
-  color: #111;
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
 }
 
 .container {
-  width: min(95vw, 1400px);
-  margin: 0 auto;
-  padding: 24px;
-  display: block;
-  box-sizing: border-box;
-  gap: 16px;
+    width: min(95vw, 1200px);
+    margin: 0 auto;
+    padding: 24px;
 }
 
-
-.card{
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+/* Updated Card to match landing page previews */
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
 }
 
+.subtle { color: var(--text-muted); }
 
-.subtle { color: #555; }
-
-.form {
-  margin-top: 8px;
-}
-
-.row {
-  display: grid;
-  gap: 6px;
-  margin: 10px 0;
-}
-
-label { font-weight: 700; }
-
-input {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  outline: none;
-}
-
-input:focus { border-color: #aaa; }
-
-button {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 10px;
-  background: #222;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-th, td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #eee;
-  text-align: left;
-  white-space: normal;
-  th:last-child, td:last-child{
-    width: 200px;
-  }
-}
-
-
-.reptileLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
-  font-weight: 700;
-}
-
-.reptileLink:hover { text-decoration: underline; }
-
-.thumb {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid #860d0d;
-}
-
-
-.btnDanger {
-  margin-top: 0;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 0;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.badge {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 12px;
-  border: 1px solid #eee;
-}
-
-.badge-ok {
-  background: #e9f7ee;
-  border-color: #bfe6cc;
-  color: #135c2e;
-}
-
-.badge-due {
-  background: #fff6db;
-  border-color: #f0d48a;
-  color: #6b4b00;
-}
-
-.badge-overdue {
-  background: #ffe2e2;
-  border-color: #f2a4a4;
-  color: #7a0b0b;
-}
-
-.badge-unknown {
-  background: #f1f3f6;
-  border-color: #d6dbe3;
-  color: #4a5568;
-}
-
-/* makes the drop down for feeding frequency look nicer */
- select.pretty-select {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 2px solid #d9e6df;
-  background-color: #ffffff;
-  font-size: 16px;
-  font-weight: 500;
-  color: #2f4f4f;
-  cursor: pointer;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background-image: url("data:image/svg+xml,%3Csvg fill='%238bc6a8' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 20px;
-
-  transition: all 0.25s ease;
-}
-
-.feed-status{
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  display: inline-block;
-}
-
-.feed-good{
-  background: #e6f7ee;
-  color: #1f7a4d;
-}
-
-.feed-soon{
-  background: #fff6d6;
-  color: #8a6d00;
-}
-
-.feed-overdue{
-  background: #fde8e8;
-  color: #9b1c1c;
-}
-
-input[type="date"]{
-  cursor: pointer;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator{
-  opacity: 1;
-  display: block;
-  cursor: pointer;
-}
-
-
-.trashBtn {
-  background: transparent;
-  color: inherit;
-  padding: 6px 8px;
-  margin-top: 0;
-}
-
-}
-
-.trashBtn:hover{
-  transform: scale(1.2);
-  color: #b00000;
-}
-
-
-.statusActions{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-
-/*  header styles  */
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.topbar-left, .topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.nav-btn {
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: #eef2f7;
-  color: #222;
-  font-weight: 600;
-}
-
-.nav-btn:hover { filter: brightness(0.97); }
-
-.user-pill {
-  background: #f6f7fb;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #e6e8ef;
-}
-
-.logout { background: #ffe5e5; }
-
-
-.error {
-  background: #ffe5e5;
-  border: 1px solid #ffcccc;
-  padding: 10px 12px;
-  border-radius: 10px;
-  margin-bottom: 12px;
-}
-/* css for the edit_feeding page  */
-.form-textarea {
-    display: block;
+/* Dark mode inputs */
+input, select, textarea, .pretty-select {
+    background-color: #0f172a;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 10px;
+    outline: none;
     width: 100%;
-    max-width: 500px;
-    margin-top: 5px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    resize: vertical; /* Allows you to pull it down, but not sideways */
 }
+
+/* Matching the "Get Started" teal button */
+button, .btn {
+    background: var(--accent-teal);
+    color: #0f172a;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+button:hover { transform: translateY(-1px); }
+
+/* Navigation adjustments */
+.nav-btn {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+}
+
+.logout { background: #ef4444; color: white; border: none; }
