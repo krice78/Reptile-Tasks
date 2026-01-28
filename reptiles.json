@@ -59,18 +59,53 @@
   {
     "id": 1768511294869,
     "user_id": 2,
-    "name": "Nirah",
-    "species": "African Fat Tail Gecko",
+    "name": "Otto",
+    "species": "Crested Gecko (Female)",
     "image_url": "https://www.avianexotichospital.com/uploads/1/0/4/8/104851457/crestedgecko_orig.jpg",
-    "appearance": "",
-    "diet": "",
-    "weight_grams": null,
+    "appearance": "yellow, light brown, grayish, no tail frog butt :)",
+    "diet": "Insects and Rapashi",
+    "weight_grams": 11.0,
     "feeding_schedule": {
       "frequency": "every_other_day",
-      "time_of_day": "",
-      "notes": "",
-      "next_feed_date": ""
+      "time_of_day": "evening",
+      "notes": "Likes Mango and Cherry Rapashi, likes crickets",
+      "next_feed_date": "2026-01-28"
     },
-    "last_fed": ""
+    "last_fed": "2026-01-26",
+    "feeding_log": [
+      {
+        "id": 1769628423378,
+        "date": "2026-01-26",
+        "food": "Crickets",
+        "amount": "2",
+        "notes": "She did not eat them, left in tank"
+      }
+    ]
+  },
+  {
+    "id": 1769626605776,
+    "user_id": 2,
+    "name": "Nirah",
+    "species": "Nelson's Albino Milk Snake",
+    "image_url": "https://cdn11.bigcommerce.com/s-a3z611ns/images/stencil/1280x1280/products/6754/5369/sn3156999__04451.1529768349.jpg?c=2",
+    "appearance": "Orange, White, Yellow stripes",
+    "diet": "Fuzzies",
+    "weight_grams": 11.0,
+    "last_fed": "2026-01-28",
+    "feeding_schedule": {
+      "frequency": "weekly",
+      "time_of_day": "evening",
+      "notes": "2 fuzzies",
+      "next_feed_date": "2026-02-04"
+    },
+    "feeding_log": [
+      {
+        "id": 1769629185321,
+        "date": "2026-01-28",
+        "food": "Fuzzies",
+        "amount": "2",
+        "notes": "ate all"
+      }
+    ]
   }
 ]

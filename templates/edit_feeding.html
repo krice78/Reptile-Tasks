@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <title>Edit Feeding - {{ reptile.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include "header.html" %}
+
+    <div class="container">
+        <a href="{{ url_for('reptile_view', reptile_id=reptile.id) }}" class="subtle">← Back to {{ reptile.name }}</a>
+        <h1>Edit Feeding Record</h1>
+
+        <div class="card">
+            <form action="{{ url_for('edit_feeding_post', reptile_id=reptile.id, feeding_id=feeding.id) }}" method="POST">
+                <label>Date:</label>
+                <input type="date" name="date" value="{{ feeding.date }}" required>
+
+                <label>Food Item:</label>
+                <input type="text" name="food" value="{{ feeding.food }}" required>
+
+                <label>Amount:</label>
+                <input type="text" name="amount" value="{{ feeding.amount }}" required>
+
+                <label>Notes:</label>
+                <textarea name="notes" rows="3">{{ feeding.notes }}</textarea>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn">Save Changes</button>
+                    <a href="{{ url_for('reptile_view', reptile_id=reptile.id) }}" class="subtle" style="margin-left: 15px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

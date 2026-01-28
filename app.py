@@ -7,39 +7,47 @@ import os
 import time
 from datetime import date, datetime, timedelta
 
-
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-me")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///reptiles.db"
 db = SQLAlchemy(app)
 
+# Authentication Logic Setup
 login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TASKS_FILE = os.path.join(BASE_DIR, "tasks.json")
-REPTILES_FILE = os.path.join(BASE_DIR, "reptiles.json")
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
 
-class Animal(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    species = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+# File Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REPTILES_FILE = os.path.join(BASE_DIR, "reptiles.json")
 
-# Feeding frequency to days mapping
+# Jason Helpers (load/save)
+def load_json(path):
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+
+def new_id():
+    return int(time.time() * 1000)
+
+# Logic Helpers
 FREQ_TO_DAYS = {
     "daily": 1,
     "every_other_day": 2,
@@ -49,275 +57,38 @@ FREQ_TO_DAYS = {
     "monthly": 30,  
 }
 
+def calc_next_feed_date(last_fed_str, frequency):
+    if not last_fed_str or not frequency:
+        return ""
+    try:
+        last = datetime.strptime(last_fed_str, "%Y-%m-%d").date()
+        days = FREQ_TO_DAYS.get(frequency.strip().lower())
+        if not days: return ""
+        return (last + timedelta(days=days)).strftime("%Y-%m-%d")
+    except ValueError:
+        return ""
+
 def feed_status(next_date_str):
+    if not next_date_str: return "unknown"
     try:
         d = datetime.strptime(next_date_str, "%Y-%m-%d").date()
-    except:
+        today = date.today()
+        if d < today: return "overdue"
+        elif (d - today).days <= 2: return "soon"
         return "good"
-
-    today = date.today()
-    if d < today:
-        return "overdue"
-    elif (d - today).days <= 2:
-        return "soon"
-    else:
-        return "good"
-
-
-def parse_yyyy_mm_dd(s: str):
-    s = (s or "").strip()
-    if not s:
-        return None
-    try:
-        return datetime.strptime(s, "%Y-%m-%d").date()
     except ValueError:
-        return None
-
-def calc_next_feed_date(last_fed_str: str, frequency: str) -> str:
-    last = parse_yyyy_mm_dd(last_fed_str)
-    days = FREQ_TO_DAYS.get((frequency or "").strip())
-    if not last or not days:
-        return ""
-    return (last + timedelta(days=days)).strftime("%Y-%m-%d")
-
-
-#  JSON helpers
-def load_json(path):
-    if not os.path.exists(path):
-        return []
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError:
-        return []
-
-
-def save_json(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-
-
-def new_id():
-    return int(time.time() * 1000)
-
-
-
-# tasks
-@app.get("/tasks")
-def get_tasks():
-    return jsonify(load_json(TASKS_FILE))
-
-
-@app.get("/tasks/<int:task_id>")
-def get_task(task_id):
-    tasks = load_json(TASKS_FILE)
-    task = next((t for t in tasks if t["id"] == task_id), None)
-    return jsonify(task or {"error": "Task not found"}), (200 if task else 404)
-
-
-@app.post("/tasks")
-@login_required
-def create_task():
-    tasks = load_json(TASKS_FILE)
-    data = request.get_json(silent=True) or {}
-
-    new_task = {
-        "id": new_id(),
-        "title": data.get("title", "Untitled Task"),
-        "completed": False
-    }
-
-    tasks.append(new_task)
-    save_json(TASKS_FILE, tasks)
-    return jsonify(new_task), 201
-
-
-@app.put("/tasks/<int:task_id>")
-@login_required
-def update_task(task_id):
-    tasks = load_json(TASKS_FILE)
-    task = next((t for t in tasks if t["id"] == task_id), None)
-    if not task:
-        return jsonify({"error": "Task not found"}), 404
-
-    data = request.get_json(silent=True) or {}
-    task["title"] = data.get("title", task["title"])
-    task["completed"] = data.get("completed", task["completed"])
-
-    save_json(TASKS_FILE, tasks)
-    return jsonify(task)
-
-
-@app.delete("/tasks/<int:task_id>")
-@login_required
-def delete_task(task_id):
-    tasks = load_json(TASKS_FILE)
-    new_tasks = [t for t in tasks if t["id"] != task_id]
-
-    if len(tasks) == len(new_tasks):
-        return jsonify({"error": "Task not found"}), 404
-
-    save_json(TASKS_FILE, new_tasks)
-    return "", 204
-
-
-# reptiles, could expand to all pets/insects 
-def validate_reptile_payload(data, partial=False):
-    """
-    partial=False: required for create
-    partial=True: allow partial updates
-    """
-    required = ["name", "species"]
-    if not partial:
-        missing = [k for k in required if not data.get(k)]
-        if missing:
-            return False, f"Missing required field(s): {', '.join(missing)}"
-    return True, ""
-
-
-@app.get("/reptiles")
-@login_required
-def get_reptiles():
-    return jsonify(load_json(REPTILES_FILE))
-
-
-@app.get("/api/reptiles/<int:reptile_id>")
-@login_required
-def get_reptile(reptile_id):
-
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    return jsonify(reptile or {"error": "Reptile not found"}), (200 if reptile else 404)
-
-
-@app.post("/reptiles")
-@login_required
-def create_reptile():
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    data = request.get_json(silent=True) or {}
-
-    ok, msg = validate_reptile_payload(data, partial=False)
-    if not ok:
-        return jsonify({"error": msg}), 400
-
-    reptile = {
-        "id": new_id(),
-        "name": data.get("name"),
-        "species": data.get("species"),
-        "appearance": data.get("appearance", ""),
-        "diet": data.get("diet", ""),
-        "weight_grams": data.get("weight_grams", None),
-        "feeding_schedule": data.get("feeding_schedule", {
-            "frequency": "",
-            "time_of_day": "",
-            "notes": ""
-        }),
-        "last_fed": data.get("last_fed", "")  #"2026-01-10"
-    }
-
-    reptiles.append(reptile)
-    save_json(REPTILES_FILE, reptiles)
-    return jsonify(reptile), 201
-
-
-@app.put("/reptiles/<int:reptile_id>")
-@login_required
-def update_reptile(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return jsonify({"error": "Reptile not found"}), 404
-
-    data = request.get_json(silent=True) or {}
-    ok, msg = validate_reptile_payload(data, partial=True)
-    if not ok:
-        return jsonify({"error": msg}), 400
-
-    # Update only provided fields
-    for key in ["name", "species", "appearance", "diet", "weight_grams", "last_fed"]:
-        if key in data:
-            reptile[key] = data[key]
-
-    if "feeding_schedule" in data and isinstance(data["feeding_schedule"], dict):
-        reptile.setdefault("feeding_schedule", {})
-        reptile["feeding_schedule"].update(data["feeding_schedule"])
-
-    save_json(REPTILES_FILE, reptiles)
-    return jsonify(reptile), 200
-
-
-@app.delete("/reptiles/<int:reptile_id>")
-@login_required
-def delete_reptile(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    new_reptiles = [r for r in reptiles if r["id"] != reptile_id]
-
-    if len(reptiles) == len(new_reptiles):
-        return jsonify({"error": "Reptile not found"}), 404
-
-    save_json(REPTILES_FILE, new_reptiles)
-    return "", 204
-
-#helpers for notifications
-
-def parse_date_yyyy_mm_dd(s: str):
-    s = (s or "").strip()
-    if not s:
-        return None
-    try:
-        return datetime.strptime(s, "%Y-%m-%d").date()
-    except ValueError:
-        return None
-
-
-def frequency_to_interval_days(freq: str):
-    """
-    Convert a human frequency string into an interval in days.
-    You can expand this mapping anytime.
-    """
-    f = (freq or "").strip().lower().replace("_", " ")
-
-
-    # common phrases
-    if "daily" in f or "every day" in f:
-        return 1
-    if "twice weekly" in f or "2x weekly" in f or "two times" in f:
-        return 3  # ~every 3-4 days
-    if "every other day" in f:
-        return 2
-    if "weekly" in f:
-        return 7
-    if "biweekly" in f or "every 2 week" in f or "every two week" in f:
-        return 14
-    if "monthly" in f:
-        return 30
-
-    # handle a number like "3 days" / "every 5 days"
-    # very lightweight parsing
-    for token in f.split():
-        if token.isdigit():
-            n = int(token)
-            if "day" in f:
-                return n
-            if "week" in f:
-                return n * 7
-
-    return None  # unknown
-
-
-
-
-def compute_feed_status(last_fed_str: str, freq_str: str):
-    """
-    Returns: (status_key, label_text)
-    status_key: 'ok', 'due', 'overdue', 'unknown'
-    """
-    last_fed = parse_date_yyyy_mm_dd(last_fed_str)
-    interval = frequency_to_interval_days(freq_str)
+        return "unknown"
+    
+def compute_feed_status(last_fed_str, freq_str):
+    # Parses dates and determines if feeding is due based on FREQ_TO_DAYS
+    last_fed = None
+    if last_fed_str:
+        try:
+            last_fed = datetime.strptime(last_fed_str, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+            
+    interval = FREQ_TO_DAYS.get(freq_str.strip().lower())
 
     if not last_fed or not interval:
         return "unknown", "Unknown"
@@ -328,368 +99,260 @@ def compute_feed_status(last_fed_str: str, freq_str: str):
 
     if days_until < 0:
         return "overdue", f"Overdue ({abs(days_until)}d)"
-    if days_until == 0:
-        return "due", "Due today"
     if days_until <= 1:
         return "due", "Due soon"
     return "ok", f"OK ({days_until}d)"
 
-#login and log out routes
+
+
+# Routes Login/Registration
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = User.query.filter_by(username=request.form.get("username", "").lower()).first()
+        if user and check_password_hash(user.password_hash, request.form.get("password", "")):
+            login_user(user)
+            return redirect(url_for("my_reptiles"))
+    return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"].strip().lower()
-        password = request.form["password"]
-        
-        if not username or not password:
-            return render_template("register.html", error="Username and password are required.")
-
-
-        if User.query.filter_by(username=username).first():
-            return render_template("register.html", error="That username is already taken.")
-
-
-        user = User(
-            username=username,
-            password_hash=generate_password_hash(password)
-        )
-        db.session.add(user)
+        hashed = generate_password_hash(request.form["password"])
+        new_user = User(username=request.form["username"].lower(), password_hash=hashed)
+        db.session.add(new_user)
         db.session.commit()
-        login_user(user)
-        return redirect(url_for("dashboard"))
-
-
+        login_user(new_user)
+        return redirect(url_for("my_reptiles"))
     return render_template("register.html")
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip().lower()
-        password = request.form.get("password", "")
-        remember = request.form.get("remember") == "1"
-
-        if not username or not password:
-            return render_template("login.html", error="Username and password are required.")
-
-        user = User.query.filter_by(username=username).first()
-        if not user or not check_password_hash(user.password_hash, password):
-            return render_template("login.html", error="Invalid username or password.")
-
-        login_user(user, remember=remember)
-        return redirect(url_for("dashboard"))
-
-
-    return render_template("login.html")
-
-
-
-# @app.route("/")
-# def landing():
-#     animals = Animal.query.filter_by(user_id=current_user.id).all()
-#     return render_template("landing.html", animals=animals)
-
-@app.route("/add", methods=["GET", "POST"])
+@app.route("/dashboard")
 @login_required
-def add_animal():
-    if request.method == "POST":
-        animal = Animal(
-            name=request.form["name"],
-            species=request.form["species"],
-            description=request.form["description"],
-            user_id=current_user.id
-        )
-        db.session.add(animal)
-        db.session.commit()
-        return redirect(url_for("dashboard"))
-
-
-    return render_template("add.html")
-
-
-@app.route("/animal/<int:animal_id>")
-@login_required
-def animal_detail(animal_id):
-    animal = Animal.query.filter_by(id=animal_id, user_id=current_user.id).first_or_404()
-    return render_template("detail.html", animal=animal)
-
-
+def dashboard():
+    # Load reptiles exactly as in other routes 
+    all_reps = load_json(REPTILES_FILE)
+    user_reps = [r for r in all_reps if r.get("user_id") == current_user.id]
+    
+    notifications = []
+    for r in user_reps:
+        #  Use existing compute_feed_status helper 
+        freq = r.get("feeding_schedule", {}).get("frequency", "")
+        last_fed = r.get("last_fed", "")
+        status_key, status_label = compute_feed_status(last_fed, freq)
+        
+        # Only grab the ones that need attention 
+        if status_key in ['due', 'overdue']:
+            notifications.append({
+                "name": r.get("name"),
+                "status": status_label,
+                "id": r.get("id"),
+                "is_overdue": (status_key == 'overdue')
+            })
+            
+    return render_template("dashboard.html", 
+                           notifications=notifications, 
+                           reptile_count=len(user_reps))
 
 @app.route("/logout")
-@login_required
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# routes to reptile form
-
-@app.get("/reptiles-form")
+# Routes for Reptiles
+@app.get("/my_reptiles")
 @login_required
-def reptiles_form():
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
+def my_reptiles():
+    # Only show reptiles belonging to current user
+    all_reps = load_json(REPTILES_FILE)
+    user_reps = [r for r in all_reps if r.get("user_id") == current_user.id]
+    return render_template("my_reptiles.html", reptiles=user_reps)
 
-
-    for r in reptiles:
-        freq = ""
-        if isinstance(r.get("feeding_schedule"), dict):
-            freq = r["feeding_schedule"].get("frequency", "")
-
-        status_key, status_label = compute_feed_status(r.get("last_fed", ""), freq)
-        r["feed_status_key"] = status_key
-        r["feed_status_label"] = status_label
-        
-
-    return render_template("reptiles_form.html", reptiles=reptiles)
-
-#delete reptile route for ui
-@app.post("/reptiles/<int:reptile_id>/delete")
+@app.post("/my_reptiles")
 @login_required
-def delete_reptile_ui(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    new_reptiles = [r for r in reptiles if r.get("id") != reptile_id]
-
-    # If not found, just go back to list
-    if len(new_reptiles) == len(reptiles):
-        return redirect(url_for("reptiles_form"))
-
-    save_json(REPTILES_FILE, new_reptiles)
-    return redirect(url_for("reptiles_form"))
-
-
-# POST route to handle reptile form submission
-@app.post("/reptiles-form")
-@login_required
-def reptiles_form_post():
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
+def my_reptiles_post():
+    all_reps = load_json(REPTILES_FILE)
     
-
-
-    name = request.form.get("name", "").strip()
-    species = request.form.get("species", "").strip()
-
-    if not name or not species:
-        return redirect(url_for("reptiles_form"))
-
-    weight_raw = request.form.get("weight_grams", "").strip()
-    try:
-        weight_grams = float(weight_raw) if weight_raw else None
-    except ValueError:
-        weight_grams = None
-
     last_fed = request.form.get("last_fed", "").strip()
     freq = request.form.get("feed_frequency", "").strip()
 
-    reptile = {
+    new_rep = {
         "id": new_id(),
         "user_id": current_user.id,
-        "name": name,
-        "species": species,
-        "image_url": request.form.get("image_url", "").strip(),
-        "appearance": request.form.get("appearance", "").strip(),
-        "diet": request.form.get("diet", "").strip(),
-        "weight_grams": weight_grams,
+        "name": request.form.get("name"),
+        "species": request.form.get("species"),
+        "image_url": request.form.get("image_url", ""),
+        "appearance": request.form.get("appearance", ""),
+        "diet": request.form.get("diet", ""),
+        "weight_grams": request.form.get("weight_grams"),
+        "last_fed": last_fed,
         "feeding_schedule": {
             "frequency": freq,
-            "time_of_day": request.form.get("feed_time", "").strip(),
-            "notes": request.form.get("feed_notes", "").strip(),
-            "next_feed_date": calc_next_feed_date(last_fed, freq),  # ✅ add this
+            "time_of_day": request.form.get("feed_time", ""),
+            "notes": request.form.get("feed_notes", ""),
+            "next_feed_date": calc_next_feed_date(last_fed, freq)
         },
-        "last_fed": last_fed,
+        "feeding_log": []
     }
-
-    reptiles.append(reptile)
-    save_json(REPTILES_FILE, reptiles)
-
-    return redirect(url_for("reptile_view", reptile_id=reptile["id"]))
-
-
-# reptile detail view route
-@app.get("/reptiles/<int:reptile_id>")
-@login_required
-def reptile_view(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-
-    if not reptile:
-        return "Reptile not found", 404
-
-    # ensure feeding_schedule exists
-    reptile.setdefault("feeding_schedule", {})
-
-    # compute next_feed_date if missing/blank (helps older reptiles)
-    if not reptile["feeding_schedule"].get("next_feed_date"):
-        last_fed = reptile.get("last_fed", "")
-        freq = reptile["feeding_schedule"].get("frequency", "")
-        reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(last_fed, freq)
-        save_json(REPTILES_FILE, reptiles)  # keeps it saved
-
-    # 🔹 calculate feed status
-    reptile["feed_status"] = feed_status(
-        reptile["feeding_schedule"].get("next_feed_date", "")
-    )
-
-    return render_template("reptile_view.html", reptile=reptile)
-
-
-@app.get("/reptiles-ui")
-def reptiles_ui():
-    return render_template("reptiles.html")
-
-@app.get("/")
-def landing():
-    return render_template("landing.html")
-
-@app.get("/dashboard")
-@login_required
-def dashboard():
-    return redirect(url_for("reptiles_form"))
-
-
-
-
-# adding 2 routes to app.py
-
-@app.get("/reptiles/<int:reptile_id>/edit")
-@login_required
-def edit_reptile_form(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return "Reptile not found", 404
-    return render_template("reptile_edit.html", reptile=reptile)
-
+    all_reps.append(new_rep)
+    save_json(REPTILES_FILE, all_reps)
+    return redirect(url_for("reptile_view", reptile_id=new_rep["id"]))
 
 @app.post("/reptiles/<int:reptile_id>/edit")
 @login_required
 def edit_reptile_post(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
+    # Load ALL to prevent data loss for other users
+    all_reps = load_json(REPTILES_FILE)
+    
+    # Find the specific reptile belonging to this user
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
     if not reptile:
         return "Reptile not found", 404
 
-    # Pull fields from reptile form
-    reptile["name"] = request.form.get("name", reptile.get("name", "")).strip()
-    reptile["species"] = request.form.get("species", reptile.get("species", "")).strip()
-    reptile["appearance"] = request.form.get("appearance", reptile.get("appearance", "")).strip()
-    reptile["diet"] = request.form.get("diet", reptile.get("diet", "")).strip()
-    reptile["image_url"] = request.form.get("image_url", reptile.get("image_url", "")).strip()
-    reptile["last_fed"] = request.form.get("last_fed", reptile.get("last_fed", "")).strip()
-
+# 1. Update Basic Info 
+    reptile["name"] = request.form.get("name", "").strip()
+    reptile["species"] = request.form.get("species", "").strip()
+    reptile["image_url"] = request.form.get("image_url", "").strip()
+    reptile["appearance"] = request.form.get("appearance", "").strip()
+    reptile["diet"] = request.form.get("diet", "").strip()
+    reptile["last_fed"] = request.form.get("last_fed", "").strip()
+    
+    # 2. Update Weight (with safety check) 
     weight_raw = request.form.get("weight_grams", "").strip()
     try:
-        reptile["weight_grams"] = float(weight_raw) if weight_raw else None
+        reptile["weight_grams"] = float(weight_raw) if weight_raw else 0.0
     except ValueError:
-        pass  # keep old weight if invalid input
+        pass 
 
-    # Feeding schedule (ensure dict exists) + update fields FIRST
-    reptile.setdefault("feeding_schedule", {})
-    reptile["feeding_schedule"]["frequency"] = request.form.get("feed_frequency", "").strip()
-    reptile["feeding_schedule"]["time_of_day"] = request.form.get("feed_time", "").strip()
-    reptile["feeding_schedule"]["notes"] = request.form.get("feed_notes", "").strip()
+    # 3. Update Feeding Schedule & Recalculate Next Date 
+    freq = request.form.get("feed_frequency", "").strip()
+    reptile["feeding_schedule"] = {
+        "frequency": freq,
+        "time_of_day": request.form.get("feed_time", "").strip(),
+        "notes": request.form.get("feed_notes", "").strip(),
+        "next_feed_date": calc_next_feed_date(reptile["last_fed"], freq)
+    }
 
-    #  calculate next feed date using the UPDATED frequency + last_fed
-    reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(
-        reptile.get("last_fed", ""),
-        reptile["feeding_schedule"].get("frequency", "")
-    )
-
-    save_json(REPTILES_FILE, reptiles)
+    save_json(REPTILES_FILE, all_reps)
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
+@app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/edit")
+@login_required
+def edit_feeding_post(reptile_id, feeding_id):
+    all_reps = load_json(REPTILES_FILE)
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if reptile:
+        # Find and update the specific feeding in the log
+        log = reptile.get("feeding_log", [])
+        feeding = next((f for f in log if f["id"] == feeding_id), None)
+        
+        if feeding:
+            feeding["date"] = request.form.get("date")
+            feeding["food"] = request.form.get("food")
+            feeding["amount"] = request.form.get("amount")
+            feeding["notes"] = request.form.get("notes")
 
-# food log POST route to save feeding entry
+            # Recalculate the overall 'last_fed' based on the newest date in the log
+            if log:
+                # This finds the most recent date string in the list
+                latest_entry = max(log, key=lambda x: x['date'])
+                reptile["last_fed"] = latest_entry["date"]
+                
+                # Update the schedule so the Dashboard knows when the next one is due
+                freq = reptile["feeding_schedule"].get("frequency", "")
+                reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(reptile["last_fed"], freq)
+
+        save_json(REPTILES_FILE, all_reps)
+        
+    return redirect(url_for("reptile_view", reptile_id=reptile_id))
+
+@app.get("/reptiles/<int:reptile_id>")
+@login_required
+def reptile_view(reptile_id):
+    all_reps = load_json(REPTILES_FILE)
+    # Security: Ensure it exists AND belongs to the user
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if not reptile: return "Reptile not found", 404
+
+    # Update status for the template
+    next_f = reptile.get("feeding_schedule", {}).get("next_feed_date", "")
+    reptile["feed_status"] = feed_status(next_f)
+    
+    return render_template("reptile_view.html", reptile=reptile, today_date=date.today().isoformat())
+
 @app.post("/reptiles/<int:reptile_id>/feedings")
 @login_required
 def add_feeding(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return "Reptile not found", 404
-
-    feed_date = request.form.get("date", "").strip()
-    food = request.form.get("food", "").strip()
-    amount = request.form.get("amount", "").strip()
-    notes = request.form.get("notes", "").strip()
-
-    # Basic validation (date + food required)
-    if not feed_date or not food:
-        return redirect(url_for("reptile_view", reptile_id=reptile_id))
-
-    reptile.setdefault("feeding_log", [])
-    reptile["feeding_log"].append({
-        "id": new_id(),
-        "date": feed_date,
-        "food": food,
-        "amount": amount,
-        "notes": notes
-    })
-
-    # keep last_fed in sync automatically
-    reptile["last_fed"] = feed_date
-
-    save_json(REPTILES_FILE, reptiles)
+    all_reps = load_json(REPTILES_FILE)
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if reptile:
+        feed_date = request.form.get("date")
+        new_entry = {
+            "id": new_id(),
+            "date": feed_date,
+            "food": request.form.get("food"),
+            "amount": request.form.get("amount"),
+            "notes": request.form.get("notes")
+        }
+        reptile.setdefault("feeding_log", []).append(new_entry)
+        
+        # Sync last_fed and re-calc next date
+        reptile["last_fed"] = feed_date
+        freq = reptile["feeding_schedule"].get("frequency", "")
+        reptile["feeding_schedule"]["next_feed_date"] = calc_next_feed_date(feed_date, freq)
+        
+        save_json(REPTILES_FILE, all_reps)
+        
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
-#debug reptile view
-@app.get("/debug/reptile-view/<int:reptile_id>")
+@app.post("/reptiles/<int:reptile_id>/delete")
 @login_required
-def debug_reptile_view(reptile_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return "Reptile not found", 404
-
-    html = render_template("reptile_view.html", reptile=reptile)
-    # show first 2000 chars so i can confirm the feeding form exists in the HTML
-    return "<pre>" + html.replace("<", "&lt;").replace(">", "&gt;")[:2000] + "</pre>"
-
-#delete feeding entry
+def delete_reptile_ui(reptile_id):
+    all_reps = load_json(REPTILES_FILE)
+    # Keep only reptiles that aren't the one being deleted (and verify ownership)
+    filtered_reps = [r for r in all_reps if not (r["id"] == reptile_id and r["user_id"] == current_user.id)]
+    save_json(REPTILES_FILE, filtered_reps)
+    return redirect(url_for("my_reptiles"))
 
 @app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/delete")
 @login_required
 def delete_feeding(reptile_id, feeding_id):
-    reptiles = [r for r in load_json(REPTILES_FILE) if r.get("user_id") == current_user.id]
-
-    reptile = next((r for r in reptiles if r["id"] == reptile_id), None)
-    if not reptile:
-        return "Reptile not found", 404
-
-    reptile.setdefault("feeding_log", [])
-    before = len(reptile["feeding_log"])
-    reptile["feeding_log"] = [e for e in reptile["feeding_log"] if e.get("id") != feeding_id]
-
-    # If nothing changed, entry wasn't found
-    if len(reptile["feeding_log"]) == before:
-        return redirect(url_for("reptile_view", reptile_id=reptile_id))
-
-    # keep last_fed synced to the newest remaining entry
-    if reptile["feeding_log"]:
-        # find max date string 
-        newest = max((e.get("date", "") for e in reptile["feeding_log"]), default="")
-        reptile["last_fed"] = newest
-    else:
-        reptile["last_fed"] = ""
-
-    save_json(REPTILES_FILE, reptiles)
+    all_reps = load_json(REPTILES_FILE)
+    # Find the reptile belonging to the current user
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if reptile:
+        # Filter the feeding_log to remove the entry with the matching feeding_id
+        old_log = reptile.get("feeding_log", [])
+        reptile["feeding_log"] = [entry for entry in old_log if entry.get("id") != feeding_id]
+        
+        # Save the updated list back to the JSON file
+        save_json(REPTILES_FILE, all_reps)
+        
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
+@app.route("/")
+def landing():
+    return render_template("landing.html")
 
-#run once then comment out
-# with app.app_context():
-#     db.create_all()
+@app.get("/reptiles/<int:reptile_id>/edit")
+@login_required
+def edit_reptile_form(reptile_id):
+    all_reps = load_json(REPTILES_FILE)
+    # Find the reptile and ensure it belongs to the current user
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if not reptile:
+        return "Reptile not found", 404
+        
+    return render_template("reptile_edit.html", reptile=reptile)
 
 
-#last line only
+
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
-    
-    
-
-

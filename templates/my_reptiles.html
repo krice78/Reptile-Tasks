@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reptile Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
+
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; background: #f6f7fb; }
+     /* .card { background: white; padding: 16px; border-radius: 12px; max-width: 720px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); } */
+      label { display:block; margin-top:10px; font-weight:600; }
+      input { width:100%; padding:10px; border-radius:10px; border:1px solid #ddd; }
+      button { margin-top: 12px; padding:10px 14px; border:0; border-radius:10px; background:#222; color:white; font-weight:600; cursor:pointer; }
+      table { margin-top: 18px; width: 100%; border-collapse: collapse; }
+      th, td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align:left; }
+      .subtle { color:#555; }
+    </style>
+  </head>
+  <body>
+    {% include "header.html" %}
+
+    <div class="container">
+    <h1>My Reptiles</h1>
+
+    <div class="reptile-grid">
+        {% for reptile in reptiles %}
+            <div class="card">
+                <h3>{{ reptile.name }}</h3>
+                <p>{{ reptile.species }}</p>
+                <a href="{{ url_for('reptile_view', reptile_id=reptile.id) }}">View Details</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <details>
+        <summary style="cursor: pointer; padding: 10px; background: #eee; border-radius: 5px;">
+            ➕ Add a New Reptile
+        </summary>
+        <div class="card" style="margin-top: 15px;">
+            <form method="post" action="{{ url_for('my_reptiles_post') }}">
+                <input name="name" placeholder="Name" required />
+                <input name="species" placeholder="Species" required />
+                <button type="submit">Save</button>
+            </form>
+        </div>
+    </details>
+</div>
+  </body>
+</html>

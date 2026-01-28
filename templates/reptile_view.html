@@ -11,7 +11,7 @@
 
     <div class="container">
       <div class="card">
-        <a href="/reptiles-form" class="subtle">← Back to list</a>
+        <a href="/my_reptiles" class="subtle">← Back to list</a>
 
         <p style="margin-top:10px;">
           <a href="{{ url_for('edit_reptile_form', reptile_id=reptile.id) }}">✏️ Edit</a>
@@ -56,65 +56,67 @@
         </div>
 
         <!-- Feeding History Section -->
-        <h2>Feeding History</h2>
+        <h2 style="margin-top:20px;">Feeding History</h2>
 
-        <form method="post" action="{{ url_for('add_feeding', reptile_id=reptile.id) }}" class="form">
-          <div class="row">
-            <label>Date *</label>
-            <input name="date" type="date" required />
+        <form method="post" action="{{ url_for('add_feeding', reptile_id=reptile.id) }}" class="form" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="row">
+              <label>Date *</label>
+              <input name="date" type="date" required value="{{ today_date }}" />
+            </div>
+
+            <div class="row">
+              <label>Food *</label>
+              <input name="food" placeholder="e.g. Dubia roaches" required />
+            </div>
+
+            <div class="row">
+              <label>Amount</label>
+              <input name="amount" placeholder="e.g. 5" />
+            </div>
+
+            <div class="row">
+              <label>Notes</label>
+              <input name="notes" placeholder="Ate well..." />
+            </div>
           </div>
-
-          <div class="row">
-            <label>Food *</label>
-            <input name="food" placeholder="Fuzzy / Dubia roaches / Pangea..." required />
-          </div>
-
-          <div class="row">
-            <label>Amount</label>
-            <input name="amount" placeholder="2 fuzzies" />
-          </div>
-
-          <div class="row">
-            <label>Notes</label>
-            <input name="notes" placeholder="Ate well / refused / shed soon..." />
-          </div>
-
-          <button type="submit">➕ Add Feeding</button>
+          <button type="submit" style="margin-top: 10px; width: 100%;">➕ Add Feeding Entry</button>
         </form>
 
-        <table>
+        <table style="width: 100%; border-collapse: collapse;">
           <thead>
-            <tr>
+            <tr style="text-align: left; border-bottom: 2px solid #eee;">
               <th>Date</th>
               <th>Food</th>
               <th>Amount</th>
               <th>Notes</th>
-              <th>Actions</th>
-
+              <th style="text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody>
             {% set log = reptile.get('feeding_log', []) %}
             {% if log|length == 0 %}
               <tr>
-                <td colspan="6" class="subtle">No feeding entries yet.</td>
+                <td colspan="6" class="subtle" style="padding: 20px; text-align: center;"> No feeding entries yet.</td>
               </tr>
             {% else %}
-              {% for e in log|reverse %}
-                <tr>
-                  <td>{{ e.date }}</td>
+              {# Sorting by date string reverse so newest is on top #}
+              {% for e in log|sort(attribute='date', reverse=True) %}
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 8px 0;">{{ e.date }}</td>
                   <td>{{ e.food }}</td>
                   <td>{{ e.amount }}</td>
-                  <td>{{ e.notes }}</td>
-                  <td>
+                  <td class="subtle small">{{ e.notes }}</td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <a href="{{ url_for('edit_feeding_form', reptile_id=reptile.id, feeding_id=e.id) }}" 
+                        style="margin-right: 10px; text-decoration: none; font-size: 0.8em;">✏️ Edit</a>
                     <form method="post"
-                            action="{{ url_for('delete_feeding', reptile_id=reptile.id, feeding_id=e.id) }}"
-                            onsubmit="return confirm('Delete this feeding entry?');"
-                            style="margin:0;">
-                        <button type="submit" class="btnDanger">Delete</button>
+                          action="{{ url_for('delete_feeding', reptile_id=reptile.id, feeding_id=e.id) }}"
+                          onsubmit="return confirm('Delete this entry?');"
+                          style="margin:0;">
+                        <button type="submit" class="btnDanger" style="padding: 2px 8px; font-size: 0.8em;">Delete</button>
                     </form>
                   </td>
-
                 </tr>
               {% endfor %}
             {% endif %}
