@@ -9,6 +9,36 @@
 
 * { box-sizing: border-box; }
 
+/* The main wrapper for your header content */
+.topbar {
+    display: flex;
+    justify-content: space-between; /* This is the secret for right-aligning */
+    align-items: center;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+/* Groups the Logo/Name on the left */
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Groups the Nav links and Logout on the right */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Optional: Make the Logout button stand out but stay aligned */
+.logout {
+    background-color: #ef4444; /* Red color from your landing page style */
+    color: white;
+    margin-top: 0; /* Ensures it doesn't jump out of alignment */
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
