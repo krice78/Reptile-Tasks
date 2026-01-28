@@ -46,6 +46,46 @@ body {
     margin: 0;
 }
 
+.btn-secondary {
+    background: transparent;
+    color: var(--accent-teal);
+    border: 2px solid var(--accent-teal);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(16, 185, 129, 0.1); /* Subtle green glow on hover */
+    color: var(--text-main);
+}
+
+/* All links throughout the app */
+a {
+    color: var(--accent-teal);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+/* This is the specific fix for "used" links */
+a:visited {
+    color: var(--accent-teal); /* Keeps it teal even after clicking */
+}
+
+/* Add a subtle hover effect so it feels interactive */
+a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* For specific subtle links like "Cancel" or "Back" */
+.subtle:visited {
+    color: var(--text-muted);
+}
+
 .container {
     width: min(95vw, 1200px);
     margin: 0 auto;
@@ -98,4 +138,30 @@ button:hover { transform: translateY(-1px); }
     border-radius: 10px;
 }
 
-/* .logout { background: #ef4444; color: white; border: none; } */
+/* Styling the clickable 'Add a New Reptile' bar */
+.dropdown-header {
+    cursor: pointer;
+    padding: 12px 20px;
+    background-color: var(--card-bg); /* Matches your cards */
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-weight: 600;
+    list-style: none; /* Removes the default arrow in some browsers */
+}
+
+.dropdown-header:hover {
+    background-color: #2d3748; /* Slightly lighter on hover */
+}
+
+/* Ensure the form inside doesn't look squished */
+.inline-form {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.inline-form input {
+    flex: 1;
+    min-width: 150px;
+}
+

@@ -35,18 +35,18 @@
 
     <hr>
 
-    <details>
-        <summary style="cursor: pointer; padding: 10px; background: #eee; border-radius: 5px;">
-            ➕ Add a New Reptile
-        </summary>
-        <div class="card" style="margin-top: 15px;">
-            <form method="post" action="{{ url_for('my_reptiles_post') }}">
-                <input name="name" placeholder="Name" required />
-                <input name="species" placeholder="Species" required />
-                <button type="submit">Save</button>
-            </form>
-        </div>
-    </details>
+<details class="add-reptile-dropdown">
+    <summary class="dropdown-header">
+        ➕ Add a New Reptile
+    </summary>
+    <div class="card" style="margin-top: 15px;">
+        <form method="post" action="{{ url_for('my_reptiles_post') }}" class="inline-form">
+            <input name="name" placeholder="Name" required />
+            <input name="species" placeholder="Species" required />
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+</details>
 </div>
   </body>
 </html>
