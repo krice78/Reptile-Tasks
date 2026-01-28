@@ -264,3 +264,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   border-radius: 10px;
   margin-bottom: 12px;
 }
+/* css for the edit_feeding page  */
+.form-textarea {
+    display: block;
+    width: 100%;
+    max-width: 500px;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical; /* Allows you to pull it down, but not sideways */
+}

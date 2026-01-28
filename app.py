@@ -236,6 +236,23 @@ def edit_reptile_post(reptile_id):
     save_json(REPTILES_FILE, all_reps)
     return redirect(url_for("reptile_view", reptile_id=reptile_id))
 
+@app.get("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/edit")
+@login_required
+def edit_feeding_form(reptile_id, feeding_id):
+    all_reps = load_json(REPTILES_FILE)
+    reptile = next((r for r in all_reps if r["id"] == reptile_id and r["user_id"] == current_user.id), None)
+    
+    if not reptile:
+        return "Reptile not found", 404
+
+    # Find the specific feeding entry in the log
+    feeding = next((f for f in reptile.get("feeding_log", []) if f["id"] == feeding_id), None)
+    
+    if not feeding:
+        return "Feeding record not found", 404
+        
+    return render_template("edit_feeding.html", reptile=reptile, feeding=feeding)
+
 @app.post("/reptiles/<int:reptile_id>/feedings/<int:feeding_id>/edit")
 @login_required
 def edit_feeding_post(reptile_id, feeding_id):
